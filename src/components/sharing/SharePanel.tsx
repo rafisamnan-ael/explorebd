@@ -271,16 +271,22 @@ export function SharePanel({ bdStatusMap, worldStatusMap, bdStats, worldStats, t
           </div>
         ) : null}
 
-        <Segmented
-          ariaLabel={t('share.preview')}
-          value={format}
-          onChange={setFormat}
-          options={[
-            { value: 'square', label: t('export.square') },
-            { value: 'social', label: 'Facebook' },
-            { value: 'story', label: t('export.story') },
-          ]}
-        />
+        <div className="field">
+          <span className="field-label">{t('share.preview')}</span>
+          <Segmented
+            ariaLabel={t('share.preview')}
+            value={format}
+            onChange={setFormat}
+            options={[
+              { value: 'social', label: 'Facebook' },
+              { value: 'square', label: 'Instagram' },
+              { value: 'story', label: 'Story' },
+            ]}
+          />
+          <span className="field-hint">
+            {size.width} × {size.height} px
+          </span>
+        </div>
 
         <div className="field">
           <label className="field-label" htmlFor="share-name">{t('share.namePrompt')}</label>
