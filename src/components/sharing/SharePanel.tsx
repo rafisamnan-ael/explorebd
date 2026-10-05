@@ -82,6 +82,7 @@ export function SharePanel({ bdStatusMap, worldStatusMap, bdStats, worldStats, t
   const shareCode = useMemo(() => encodeShareMap(statusMap, name, scope), [statusMap, name, scope]);
   const shareUrl = useMemo(() => shareMapUrl(shareCode), [shareCode]);
   const siteUrl = typeof window !== 'undefined' ? window.location.host : '';
+  const tag = scope === 'bd' ? 'Exploring Bangladesh' : 'Exploring World';
   const size = shareFormatSize[format];
   const previewScale = Math.min(1, 520 / size.width);
 
@@ -92,6 +93,7 @@ export function SharePanel({ bdStatusMap, worldStatusMap, bdStats, worldStats, t
       statusMap={statusMap}
       theme={theme}
       locale={shortLocale}
+      tag={tag}
       visited={stats.visited}
       total={stats.total}
       unit={unit}

@@ -65,14 +65,24 @@ export const db = new ExploreDb();
 
 export async function ensureSettings(): Promise<AppSettings> {
   const existing = await db.settings.get('settings');
-  if (existing) return existing;
+  if (existing) {
+    // One-time flip so district labels default to on for existing users too.
+    const migrated = await getMeta<boolean>('labelsDefaultOn');
+    if (!migrated) {
+      const next = { ...existing, showLabels: true, updatedAt: new Date().toISOString() };
+      await db.settings.put(next);
+      await setMeta('labelsDefaultOn', true);
+      return next;
+    }
+    return existing;
+  }
   const fresh: AppSettings = {
     id: 'settings',
     locale: 'bn-BD',
     theme: 'system',
     displayName: '',
     mapThemeId: 'forest',
-    showLabels: false,
+    showLabels: true,
     labelLanguage: 'en',
     backgroundTexture: true,
     roundTrip: true,
