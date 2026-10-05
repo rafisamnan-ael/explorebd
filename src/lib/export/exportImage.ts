@@ -1,25 +1,54 @@
-import { toJpeg, toPng, toCanvas } from 'html-to-image';
+import { toBlob, toCanvas, toJpeg, toPng } from 'html-to-image';
 
-export async function nodeToPng(node: HTMLElement, pixelRatio = 2): Promise<string> {
-  return toPng(node, {
-    pixelRatio,
-    cacheBust: true,
-    backgroundColor: undefined,
-  });
+/** Lower the export scale on small screens to avoid mobile memory limits. */
+export function exportScale(): number {
+  const narrow = typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches;
+  return narrow ? 1.5 : 2;
 }
 
-export async function nodeToJpeg(node: HTMLElement, pixelRatio = 2, quality = 0.94): Promise<string> {
-  return toJpeg(node, {
-    pixelRatio,
+interface BlobOptions {
+  type?: 'image/png' | 'image/jpeg';
+  quality?: number;
+  pixelRatio?: number;
+}
+
+export async function nodeToBlob(node: HTMLElement, options: BlobOptions = {}): Promise<Blob> {
+  const { type = 'image/png', quality, pixelRatio = exportScale() } = options;
+  const blob = await toBlob(node, {
+    type,
     quality,
+    pixelRatio,
     cacheBust: true,
-    backgroundColor: '#ffffff',
+    backgroundColor: type === 'image/jpeg' ? '#ffffff' : undefined,
   });
+  if (!blob) throw new Error('Image render failed');
+  return blob;
 }
 
-export async function nodeToPdfDataUrl(node: HTMLElement, pixelRatio = 2): Promise<{ dataUrl: string; width: number; height: number }> {
+export async function nodeToPng(node: HTMLElement, pixelRatio = exportScale()): Promise<string> {
+  return toPng(node, { pixelRatio, cacheBust: true });
+}
+
+export async function nodeToJpeg(node: HTMLElement, pixelRatio = exportScale(), quality = 0.94): Promise<string> {
+  return toJpeg(node, { pixelRatio, quality, cacheBust: true, backgroundColor: '#ffffff' });
+}
+
+export async function nodeToPdfDataUrl(node: HTMLElement, pixelRatio = exportScale()): Promise<{ dataUrl: string; width: number; height: number }> {
   const canvas = await toCanvas(node, { pixelRatio, cacheBust: true });
   return { dataUrl: canvas.toDataURL('image/jpeg', 0.95), width: canvas.width, height: canvas.height };
+}
+
+/** Saves a Blob using an object URL (works on desktop and Android Chrome; Samsung Internet may prefer "Open image"). */
+export function downloadBlob(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.rel = 'noopener';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 10000);
 }
 
 export function downloadDataUrl(dataUrl: string, filename: string): void {
@@ -32,16 +61,27 @@ export function downloadDataUrl(dataUrl: string, filename: string): void {
   link.remove();
 }
 
-/** Copies a PNG data URL to the clipboard (image/png). Returns false if unsupported. */
-export async function copyImageToClipboard(dataUrl: string): Promise<boolean> {
+/** Opens the image in a new tab — the most reliable mobile fallback (long-press to save/share). */
+export function openBlobImage(blob: Blob): boolean {
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, '_blank', 'noopener,noreferrer');
+  window.setTimeout(() => URL.revokeObjectURL(url), 60000);
+  return Boolean(win);
+}
+
+/** Copies a PNG blob to the clipboard. Returns false where image clipboard writes are unsupported. */
+export async function copyBlobToClipboard(blob: Blob): Promise<boolean> {
   try {
     if (typeof navigator === 'undefined' || !navigator.clipboard || typeof ClipboardItem === 'undefined') return false;
-    const blob = await (await fetch(dataUrl)).blob();
     await navigator.clipboard.write([new ClipboardItem({ [blob.type || 'image/png']: blob })]);
     return true;
   } catch {
     return false;
   }
+}
+
+export function blobToFile(blob: Blob, filename: string): File {
+  return new File([blob], filename, { type: blob.type || 'image/png' });
 }
 
 export async function downloadPdf(node: HTMLElement, filename: string): Promise<void> {

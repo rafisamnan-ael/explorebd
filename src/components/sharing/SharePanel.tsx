@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Copy,
   Download,
+  ExternalLink,
   Facebook,
   FileImage,
   ClipboardCopy,
@@ -21,9 +22,9 @@ import { Segmented } from '@/components/ui/Segmented';
 import { ShareCard, shareFormatSize, type ShareFormat } from './ShareCard';
 import type { MapTheme } from '@/lib/map/themes';
 import type { TravelStatus } from '@/types';
-import { downloadDataUrl, downloadPdf, nodeToJpeg, nodeToPng, printNode, copyImageToClipboard } from '@/lib/export/exportImage';
+import { nodeToBlob, downloadBlob, openBlobImage, copyBlobToClipboard, blobToFile, downloadPdf, printNode } from '@/lib/export/exportImage';
 import { buildShareCaption, encodeShareMap, shareMapUrl, type ShareScope } from '@/lib/share/shareCode';
-import { dataUrlToFile, nativeShare, openShareWindow, platformShareUrl, sharePlatforms, type SharePlatform } from '@/lib/share/social';
+import { openShareWindow, platformShareUrl, sharePlatforms, type SharePlatform } from '@/lib/share/social';
 
 const platformIcons: Record<SharePlatform, typeof Facebook> = {
   facebook: Facebook,
@@ -157,20 +158,73 @@ export function SharePanel({ bdStatusMap, worldStatusMap, bdStats, worldStats, t
     }
   };
 
+  const makeBlob = () => nodeToBlob(captureRef.current!, { type: 'image/png' });
+
+  const fileShareSupported = (file: File) =>
+    typeof navigator !== 'undefined' && 'canShare' in navigator && navigator.canShare({ files: [file] });
+
   const shareNative = () =>
     withCapture('native', async () => {
-      const dataUrl = await nodeToPng(captureRef.current!, 2);
-      const file = dataUrlToFile(dataUrl, `explorebd-map-${Date.now()}.png`);
-      const ok = await nativeShare({ title: t('share.title'), text: `${caption}\n${shareUrl}`, url: shareUrl, file });
-      if (!ok) toast(t('share.nativeUnsupported'));
+      const blob = await makeBlob();
+      const file = blobToFile(blob, `explorebd-${scope}-${format}.png`);
+      if (fileShareSupported(file)) {
+        try {
+          await navigator.share({ files: [file], title: t('share.title'), text: `${caption}\n${shareUrl}`, url: shareUrl });
+        } catch {
+          /* user cancelled — do nothing */
+        }
+        return;
+      }
+      // Fallback for browsers without file sharing (e.g. Samsung Internet): open the image.
+      const opened = openBlobImage(blob);
+      toast(opened ? t('share.imageOpened') : t('share.nativeUnsupported'));
     });
 
   const copyImage = () =>
     withCapture('copy', async () => {
-      const dataUrl = await nodeToPng(captureRef.current!, 2);
-      const ok = await copyImageToClipboard(dataUrl);
-      toast(ok ? t('share.imageCopied') : t('share.copyUnsupported'), ok ? 'success' : 'default');
+      const blob = await makeBlob();
+      if (await copyBlobToClipboard(blob)) {
+        toast(t('share.imageCopied'), 'success');
+        return;
+      }
+      // Image clipboard is unsupported on many mobile browsers — use the share sheet, else open the image.
+      const file = blobToFile(blob, `explorebd-${scope}-${format}.png`);
+      if (fileShareSupported(file)) {
+        try {
+          await navigator.share({ files: [file], title: t('share.title'), text: caption, url: shareUrl });
+        } catch {
+          /* cancelled */
+        }
+        return;
+      }
+      const opened = openBlobImage(blob);
+      toast(opened ? t('share.imageOpened') : t('share.copyUnsupported'));
     });
+
+  // Universal fallback: open the image in a new tab (open synchronously so popup blockers allow it).
+  const openImage = () => {
+    const win = window.open('', '_blank');
+    void (async () => {
+      setBusy('open');
+      try {
+        const blob = await makeBlob();
+        const url = URL.createObjectURL(blob);
+        if (win) win.location.href = url;
+        else window.open(url, '_blank');
+        window.setTimeout(() => URL.revokeObjectURL(url), 60000);
+        toast(t('share.imageOpened'));
+      } catch {
+        try {
+          win?.close();
+        } catch {
+          /* ignore */
+        }
+        toast(t('errors.generic'), 'danger');
+      } finally {
+        setBusy(null);
+      }
+    })();
+  };
 
   return (
     <div className="share-layout">
@@ -288,11 +342,14 @@ export function SharePanel({ bdStatusMap, worldStatusMap, bdStats, worldStats, t
             <button type="button" className="btn btn-primary btn-sm" disabled={busy === 'copy'} onClick={() => void copyImage()}>
               {busy === 'copy' ? <Loader2 size={15} className="spin" aria-hidden /> : <ClipboardCopy size={15} aria-hidden />} {t('share.copyImage')}
             </button>
-            <button type="button" className="btn btn-secondary btn-sm" disabled={busy === 'png'} onClick={() => void withCapture('png', async () => { const d = await nodeToPng(captureRef.current!, 2); downloadDataUrl(d, `explorebd-${scope}-${format}.png`); toast(t('export.ready'), 'success'); })}>
+            <button type="button" className="btn btn-secondary btn-sm" disabled={busy === 'png'} onClick={() => void withCapture('png', async () => { const b = await makeBlob(); downloadBlob(b, `explorebd-${scope}-${format}.png`); toast(t('export.ready'), 'success'); })}>
               {busy === 'png' ? <Loader2 size={15} className="spin" aria-hidden /> : <FileImage size={15} aria-hidden />} PNG
             </button>
-            <button type="button" className="btn btn-secondary btn-sm" disabled={busy === 'jpg'} onClick={() => void withCapture('jpg', async () => { const d = await nodeToJpeg(captureRef.current!, 2); downloadDataUrl(d, `explorebd-${scope}-${format}.jpg`); toast(t('export.ready'), 'success'); })}>
+            <button type="button" className="btn btn-secondary btn-sm" disabled={busy === 'jpg'} onClick={() => void withCapture('jpg', async () => { const b = await nodeToBlob(captureRef.current!, { type: 'image/jpeg', quality: 0.94 }); downloadBlob(b, `explorebd-${scope}-${format}.jpg`); toast(t('export.ready'), 'success'); })}>
               <Download size={15} aria-hidden /> JPG
+            </button>
+            <button type="button" className="btn btn-secondary btn-sm" disabled={busy === 'open'} onClick={() => openImage()}>
+              {busy === 'open' ? <Loader2 size={15} className="spin" aria-hidden /> : <ExternalLink size={15} aria-hidden />} {t('share.openImage')}
             </button>
             <button type="button" className="btn btn-secondary btn-sm" disabled={busy === 'pdf'} onClick={() => void withCapture('pdf', async () => { await downloadPdf(captureRef.current!, `explorebd-${scope}-${format}.pdf`); toast(t('export.ready'), 'success'); })}>
               <FileText size={15} aria-hidden /> PDF
@@ -306,7 +363,7 @@ export function SharePanel({ bdStatusMap, worldStatusMap, bdStats, worldStats, t
         <p className="subtle" style={{ fontSize: '0.78rem' }}>{t('share.orCopy')}</p>
       </div>
 
-      <div aria-hidden style={{ position: 'fixed', left: -100000, top: 0, pointerEvents: 'none', opacity: 0 }}>
+      <div aria-hidden style={{ position: 'fixed', left: -20000, top: 0, pointerEvents: 'none' }}>
         <div ref={captureRef}>{card}</div>
       </div>
     </div>

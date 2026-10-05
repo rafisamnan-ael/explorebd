@@ -78,7 +78,7 @@ export function ShareCard({
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        background: `linear-gradient(180deg, ${theme.background} 0%, color-mix(in srgb, ${theme.background} 84%, ${theme.titleColor}) 100%)`,
+        background: `linear-gradient(180deg, ${theme.panel} 0%, ${theme.background} 100%)`,
         fontFamily: 'Inter, "Noto Sans Bengali", system-ui, sans-serif',
       }}
     >
@@ -136,7 +136,7 @@ export function ShareCard({
             height: Math.max(12, s.pad * 0.36),
             borderRadius: 999,
             overflow: 'hidden',
-            background: `color-mix(in srgb, ${theme.titleColor} 14%, transparent)`,
+            background: theme.districtStroke,
             boxShadow: `inset 0 0 0 1px ${theme.districtStroke}`,
           }}
         >

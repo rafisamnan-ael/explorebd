@@ -641,6 +641,8 @@
     "copyImage": "Copy image",
     "imageCopied": "Image copied — paste anywhere",
     "copyUnsupported": "Copying isn't supported here — use download",
+    "openImage": "Open image",
+    "imageOpened": "Image opened — long-press to save or share",
     "download": "Download",
     "shareTo": "Share to",
     "orCopy": "or copy and share",
