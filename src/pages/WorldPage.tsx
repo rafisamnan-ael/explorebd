@@ -61,9 +61,14 @@ export default function WorldPage() {
 
   const handleSelect = (countryId: string) => {
     const current = statusMap[countryId] ?? 'unvisited';
-    if (current === 'unvisited') void setCountryStatus(countryId, 'visited');
-    setSelected(countryId);
-    if (isMobile) setSheetOpen(true);
+    if (current === 'unvisited') {
+      // Mark as "went" directly — no editor prompt on the first tap.
+      void setCountryStatus(countryId, 'visited');
+      setSelected(countryId);
+    } else {
+      setSelected(countryId);
+      if (isMobile) setSheetOpen(true);
+    }
   };
 
   const pickStatus = (countryId: string, status: TravelStatus) => {

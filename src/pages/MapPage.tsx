@@ -90,10 +90,13 @@ export default function MapPage() {
   const handleMapClick = (districtId: string) => {
     const current = statusMap[districtId] ?? 'unvisited';
     if (current === 'unvisited') {
+      // Mark as "went" directly — no editor prompt, especially on mobile.
       void setStatus(districtId, 'visited');
+      setSelectedId(districtId);
+    } else {
+      setSelectedId(districtId);
+      if (isMobile) setPanel('list');
     }
-    setSelectedId(districtId);
-    if (isMobile) setPanel('list');
   };
 
   const pickStatus = (districtId: string, status: TravelStatus) => {
@@ -110,7 +113,6 @@ export default function MapPage() {
     const current = statusMap[districtId] ?? 'unvisited';
     if (current === 'unvisited') void setStatus(districtId, 'visited');
     setSelectedId(districtId);
-    if (isMobile) setPanel('list');
   };
 
   const listSection = (
