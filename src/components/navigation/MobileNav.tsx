@@ -41,6 +41,7 @@ export function BottomNav() {
 
   const moreLinks = [
     features.worldMap ? { to: '/world', key: 'nav.world' } : null,
+    { to: '/share', key: 'share.studio' },
     { to: '/famous', key: 'nav.famous' },
     features.travelJournal ? { to: '/journal', key: 'nav.journal' } : null,
     { to: '/games', key: 'nav.games' },

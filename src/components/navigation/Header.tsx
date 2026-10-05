@@ -23,6 +23,7 @@ export function Header() {
 
   const moreLinks = [
     features.worldMap ? { to: '/world', key: 'nav.world' } : null,
+    { to: '/share', key: 'share.studio' },
     { to: '/famous', key: 'nav.famous' },
     features.travelJournal ? { to: '/journal', key: 'nav.journal' } : null,
     features.leaderboard ? { to: '/leaderboard', key: 'nav.leaderboard' } : null,

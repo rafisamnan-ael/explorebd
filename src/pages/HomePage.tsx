@@ -8,6 +8,7 @@ import {
   Mountain,
   Palmtree,
   Route,
+  Share2,
   Soup,
   Sparkles,
   TreePine,
@@ -260,6 +261,21 @@ export default function HomePage() {
       </section>
 
       <section className="section" style={{ background: 'var(--surface-2)' }}>
+        <div className="container">
+          <div className="card card-pad share-marketing">
+            <span className="interest-icon"><Share2 size={20} aria-hidden /></span>
+            <div style={{ flex: 1, minWidth: 260 }}>
+              <h2 className="section-title" style={{ fontSize: '1.4rem' }}>{t('share.marketingTitle')}</h2>
+              <p className="muted">{t('share.marketingBody')}</p>
+            </div>
+            <Link to="/share" className="btn btn-primary btn-lg">
+              <Share2 size={18} aria-hidden /> {t('share.title')}
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
         <div className="container">
           <div className="card card-pad cluster" style={{ gap: 16, justifyContent: 'space-between', flexWrap: 'wrap' }}>
             <div style={{ maxWidth: 640 }}>

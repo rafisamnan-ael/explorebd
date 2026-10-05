@@ -15,7 +15,7 @@ async function main() {
   const { districts } = await import('../src/data/districts.ts');
   const { places } = await import('../src/data/places.ts');
 
-  const staticRoutes = ['/', '/map', '/world', '/guide', '/famous', '/planner', '/passport', '/journal', '/games', '/games/quiz', '/games/map-puzzle', '/leaderboard', '/about', '/credits', '/privacy', '/terms', '/settings'];
+  const staticRoutes = ['/', '/map', '/world', '/guide', '/famous', '/planner', '/passport', '/share', '/journal', '/games', '/games/quiz', '/games/map-puzzle', '/leaderboard', '/about', '/credits', '/privacy', '/terms', '/settings'];
   const monthRoutes = Array.from({ length: 12 }, (_, i) => `/season/${i + 1}`);
 
   const urls: Array<{ loc: string; priority: string; changefreq: string }> = [

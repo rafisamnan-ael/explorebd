@@ -16,6 +16,8 @@ const FamousPage = lazy(() => import('@/pages/FamousPage'));
 const SeasonPage = lazy(() => import('@/pages/SeasonPage'));
 const PlannerPage = lazy(() => import('@/pages/PlannerPage'));
 const PassportPage = lazy(() => import('@/pages/PassportPage'));
+const ShareStudioPage = lazy(() => import('@/pages/ShareStudioPage'));
+const SharedMapPage = lazy(() => import('@/pages/SharedMapPage'));
 const JournalPage = lazy(() => import('@/pages/JournalPage'));
 const GamesPage = lazy(() => import('@/pages/GamesPage'));
 const QuizPage = lazy(() => import('@/pages/QuizPage'));
@@ -57,6 +59,8 @@ export function App() {
                 <Route path="season/:monthSlug" element={<SeasonPage />} />
                 <Route path="planner" element={<PlannerPage />} />
                 <Route path="passport" element={<PassportPage />} />
+                <Route path="share" element={<ShareStudioPage />} />
+                <Route path="m/:code" element={<SharedMapPage />} />
                 <Route path="journal" element={<JournalPage />} />
                 <Route path="games" element={<GamesPage />} />
                 <Route path="games/quiz" element={<QuizPage />} />

@@ -181,15 +181,13 @@ export default function PassportPage() {
         statusMap={statusMap}
         theme={theme}
         legendLabels={legendLabels}
-        model={{
-          title: t('map.progress', { visited: stats.visitedDistricts, total: stats.totalDistricts }),
-          subtitle: t('passport.title'),
-          displayName: settings?.displayName || undefined,
-          stats: [
-            { label: t('passport.districtsVisited'), value: String(stats.visitedDistricts) },
-            { label: t('passport.divisionsComplete'), value: `${stats.divisionsComplete}/8` },
-            { label: t('passport.travelPercent'), value: `${Math.round(stats.travelPercent * 100)}%` },
-          ],
+        displayName={settings?.displayName || undefined}
+        subtitle={t('passport.title')}
+        stats={{
+          visited: stats.visitedDistricts,
+          total: stats.totalDistricts,
+          divisions: stats.divisionsComplete,
+          percent: Math.round(stats.travelPercent * 100),
         }}
       />
     </div>
