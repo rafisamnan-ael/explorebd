@@ -14,8 +14,8 @@ export const mapConfig = {
   initialCenter: [90.3563, 23.685] as [number, number],
   initialZoom: 6.2,
   bounds: [
-    [87.8, 20.3],
-    [92.9, 26.9],
+    [88.0, 20.6],
+    [92.7, 26.7],
   ] as [[number, number], [number, number]],
 };
 

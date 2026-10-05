@@ -1,5 +1,6 @@
 import type { TransportMode } from '@/types';
 import type { RouteLeg } from '@/lib/routing/types';
+import { foodPerDay, hotelRateForDistrict, styleForHotelTier } from '@/data/travel-cost';
 
 export type HotelTier = 'budget' | 'mid' | 'premium';
 export type Pace = 'relaxed' | 'balanced' | 'packed';
@@ -11,6 +12,7 @@ export interface BudgetInput {
   hotelTier: HotelTier;
   pace: Pace;
   transportPreferences: TransportMode[];
+  destinationDistrictId?: string;
 }
 
 export interface BudgetCategory {
@@ -44,7 +46,7 @@ function primaryTransport(prefs: TransportMode[]): TransportMode {
 }
 
 export function computeBudget(input: BudgetInput): BudgetResult {
-  const { legs, days, travelerCount, hotelTier, pace, transportPreferences } = input;
+  const { legs, days, travelerCount, hotelTier, pace, transportPreferences, destinationDistrictId } = input;
   const travelers = Math.max(1, travelerCount);
   const nights = Math.max(0, days - 1);
   const mode = primaryTransport(transportPreferences);
@@ -60,9 +62,12 @@ export function computeBudget(input: BudgetInput): BudgetResult {
     transport = totalKm * budgetRates.transportPerKmPerson.car! + Math.max(0, travelers - 3) * totalKm * 1.5;
   }
 
+  const hotel = destinationDistrictId ? hotelRateForDistrict(destinationDistrictId, hotelTier) : null;
+  const nightlyRate = hotel?.rate ?? budgetRates.hotelPerRoomNight[hotelTier];
   const rooms = Math.ceil(travelers / 2);
-  const accommodation = nights * rooms * budgetRates.hotelPerRoomNight[hotelTier];
-  const food = days * travelers * budgetRates.foodPerPersonDay[hotelTier] * paceFactor[pace];
+  const accommodation = nights * rooms * nightlyRate;
+  const dailyFood = foodPerDay(styleForHotelTier(hotelTier));
+  const food = days * travelers * dailyFood * paceFactor[pace];
   const entryFees = days * travelers * budgetRates.activityPerPersonDay * paceFactor[pace];
   const localTransport = days * travelers * budgetRates.localTransportPerPersonDay;
 
@@ -84,8 +89,8 @@ export function computeBudget(input: BudgetInput): BudgetResult {
     perPerson: Math.round(total / travelers),
     assumptions: [
       `Transport: ৳${perKm}/km/person (${mode})`,
-      `Hotel: ৳${budgetRates.hotelPerRoomNight[hotelTier]}/room/night × ${rooms} room(s) × ${nights} night(s)`,
-      `Food: ৳${budgetRates.foodPerPersonDay[hotelTier]}/person/day`,
+      `Hotel: ৳${nightlyRate}/room/night × ${rooms} room(s) × ${nights} night(s)${hotel ? ` · ${hotel.source}` : ''}`,
+      `Food: ৳${dailyFood}/person/day`,
       `Activities: ৳${budgetRates.activityPerPersonDay}/person/day`,
       `Contingency: ${Math.round(budgetRates.contingencyRate * 100)}%`,
     ],

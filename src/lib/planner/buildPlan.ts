@@ -37,6 +37,7 @@ export async function buildPlanFromDraft(draft: TripDraft): Promise<BuiltPlan> {
     hotelTier: draft.hotelTier,
     pace: draft.pace,
     transportPreferences: draft.transportPreferences,
+    destinationDistrictId: draft.destinationDistrictIds[0],
   });
 
   return {

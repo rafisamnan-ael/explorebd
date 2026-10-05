@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { Compass, Map, Menu, Route, Search, Ticket, UserRound } from 'lucide-react';
+import { Compass, Map, Route, Search, Ticket, UserRound } from 'lucide-react';
 import { brand } from '@/config/brand';
 import { features } from '@/config/features';
 import { useI18n } from '@/i18n';
@@ -33,8 +33,8 @@ export function BottomNav() {
   const location = useLocation();
 
   const items = [
-    { to: '/map', key: 'nav.map', Icon: Map },
     { to: '/guide', key: 'nav.explore', Icon: Compass },
+    { to: '/map', key: 'nav.map', Icon: Map },
     { to: '/planner', key: 'nav.plan', Icon: Route },
     { to: '/passport', key: 'nav.passport', Icon: Ticket },
   ];
@@ -70,8 +70,8 @@ export function BottomNav() {
           onClick={() => setMenuOpen(true)}
           aria-haspopup="dialog"
         >
-          <Menu size={20} aria-hidden />
-          <span>{t('nav.more')}</span>
+          <UserRound size={20} aria-hidden />
+          <span>{t('nav.profile')}</span>
         </button>
       </nav>
 

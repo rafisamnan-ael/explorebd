@@ -123,6 +123,20 @@ h4 {
   border: 0;
 }
 
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.display-xl {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.4rem, 5.2vw, 4.2rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+}
+
 .skip-link {
   position: absolute;
   left: var(--space-4);

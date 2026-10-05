@@ -70,20 +70,18 @@ export function SharePanel({ bdStatusMap, worldStatusMap, bdStats, worldStats, t
     setCaption(buildShareCaption(shortLocale, stats, scope));
   }, [shortLocale, stats, scope]);
 
-  const progressText = useMemo(() => {
-    const unit =
-      scope === 'bd'
-        ? shortLocale === 'bn'
-          ? 'জেলা'
-          : 'districts'
-        : shortLocale === 'bn'
-          ? 'দেশ'
-          : 'countries';
-    return `${stats.visited} / ${stats.total} ${unit}`;
-  }, [scope, shortLocale, stats]);
+  const unit =
+    scope === 'bd'
+      ? shortLocale === 'bn'
+        ? 'জেলা'
+        : 'districts'
+      : shortLocale === 'bn'
+        ? 'দেশ'
+        : 'countries';
 
   const shareCode = useMemo(() => encodeShareMap(statusMap, name, scope), [statusMap, name, scope]);
   const shareUrl = useMemo(() => shareMapUrl(shareCode), [shareCode]);
+  const siteUrl = typeof window !== 'undefined' ? window.location.host : '';
   const size = shareFormatSize[format];
   const previewScale = Math.min(1, 520 / size.width);
 
@@ -94,7 +92,10 @@ export function SharePanel({ bdStatusMap, worldStatusMap, bdStats, worldStats, t
       statusMap={statusMap}
       theme={theme}
       locale={shortLocale}
-      progressText={progressText}
+      visited={stats.visited}
+      total={stats.total}
+      unit={unit}
+      url={siteUrl}
       displayName={name || undefined}
       showLabels={showLabels}
       texture

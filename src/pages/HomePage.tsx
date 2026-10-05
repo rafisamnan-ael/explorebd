@@ -73,20 +73,24 @@ export default function HomePage() {
 
   return (
     <div>
-      <section className="hero">
+      <section className="hero hero-premium">
         <div className="container hero-grid">
           <div className="hero-copy">
-            <span className="eyebrow">{t('home.eyebrow')}</span>
-            <h1>{t('home.title')}</h1>
-            <p>{t('home.subtitle')}</p>
+            <span className="eyebrow hero-eyebrow">{brand.tagline}</span>
+            <h1 className="display-xl">{t('home.heroTitle')}</h1>
+            <p className="hero-sub">{t('home.heroSubtitle')}</p>
             <div className="hero-actions">
               <Link to="/map" className="btn btn-primary btn-lg">
-                {t('home.ctaPrimary')}
+                {t('home.ctaStartMap')}
               </Link>
               <Link to="/planner" className="btn btn-secondary btn-lg">
                 {t('home.ctaSecondary')}
               </Link>
+              <Link to="/guide" className="btn btn-ghost btn-lg">
+                {t('home.ctaExplorePlaces')}
+              </Link>
             </div>
+            <p className="hero-support">{t('home.heroSupport')}</p>
           </div>
           <div className="hero-visual">
             <div className="hero-map">
@@ -113,10 +117,10 @@ export default function HomePage() {
       <section className="section">
         <div className="container">
           <SectionHead
-            title={t('home.previewTitle')}
+            title={t('home.mapPreviewTitle')}
             action={
-              <Link to="/passport" className="btn btn-sm btn-secondary">
-                {t('passport.title')} <ArrowRight size={15} aria-hidden />
+              <Link to="/map" className="btn btn-sm btn-secondary">
+                {t('home.mapPreviewCta')} <ArrowRight size={15} aria-hidden />
               </Link>
             }
           />

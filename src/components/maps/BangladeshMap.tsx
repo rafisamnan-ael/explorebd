@@ -3,7 +3,7 @@ import maplibregl, { type Map as MlMap, type MapMouseEvent } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import type { FeatureCollection } from 'geojson';
 import { mapConfig } from '@/config/providers';
-import { districts } from '@/data/districts';
+import { districts, districtById } from '@/data/districts';
 import type { TravelStatus } from '@/types';
 import { loadDistrictGeoJson } from '@/lib/map/loadGeo';
 import { prepareDistrictGeoJson } from '@/lib/map/prepareGeo';
@@ -84,12 +84,15 @@ export function BangladeshMap({
   const hoveredRef = useRef<string | null>(null);
   const themeRef = useRef(theme);
   const statusRef = useRef(statusMap);
+  const labelLangRef = useRef(labelLanguage);
+  const tooltipRef = useRef<HTMLDivElement>(null);
   const callbacksRef = useRef({ onDistrictClick, onBackgroundClick });
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
   const [tilesOk, setTilesOk] = useState(true);
 
   themeRef.current = theme;
   statusRef.current = statusMap;
+  labelLangRef.current = labelLanguage;
   callbacksRef.current = { onDistrictClick, onBackgroundClick };
 
   useEffect(() => {
@@ -103,7 +106,7 @@ export function BangladeshMap({
       center: mapConfig.initialCenter,
       zoom: mapConfig.initialZoom,
       bounds: mapConfig.bounds,
-      fitBoundsOptions: { padding: 30, duration: 0 },
+      fitBoundsOptions: { padding: 8, duration: 0 },
       attributionControl: false,
       dragRotate: false,
       pitchWithRotate: false,
@@ -161,16 +164,27 @@ export function BangladeshMap({
       const features = map.queryRenderedFeatures(event.point, { layers: ['districts-fill'] });
       const feature = features[0];
       const featureId = feature ? String(feature.id) : undefined;
+      const districtId = (feature?.properties as { districtId?: string } | undefined)?.districtId;
       if (hoveredRef.current && hoveredRef.current !== featureId) {
         map.setFeatureState({ source: SOURCE_ID, id: hoveredRef.current }, { hover: false });
       }
+      const tooltip = tooltipRef.current;
       if (feature && featureId) {
         map.getCanvas().style.cursor = 'pointer';
         hoveredRef.current = featureId;
         map.setFeatureState({ source: SOURCE_ID, id: featureId }, { hover: true });
+        if (tooltip && districtId) {
+          const d = districtById.get(districtId);
+          const lang = labelLangRef.current;
+          tooltip.textContent = d ? (lang === 'bn' ? d.nameBn : lang === 'both' ? `${d.nameEn} · ${d.nameBn}` : d.nameEn) : '';
+          tooltip.style.display = 'block';
+          tooltip.style.left = `${event.point.x + 14}px`;
+          tooltip.style.top = `${event.point.y + 14}px`;
+        }
       } else {
         map.getCanvas().style.cursor = '';
         hoveredRef.current = null;
+        if (tooltip) tooltip.style.display = 'none';
       }
     };
 
@@ -277,7 +291,9 @@ export function BangladeshMap({
         markersRef.current.set(district.id, marker);
       }
       const el = marker.getElement();
-      if (!showLabels) {
+      const marked = statusMap[district.id] !== undefined && statusMap[district.id] !== 'unvisited';
+      const shouldShow = showLabels && (marked || district.id === selectedDistrictId);
+      if (!shouldShow) {
         el.style.display = 'none';
         continue;
       }
@@ -291,7 +307,7 @@ export function BangladeshMap({
       el.style.color = theme.labelColor;
       el.style.display = '';
     }
-  }, [showLabels, labelLanguage, theme, state]);
+  }, [showLabels, labelLanguage, theme, state, statusMap, selectedDistrictId]);
 
   return (
     <div className={className} style={{ position: 'relative', width: '100%', height: '100%' }}>
@@ -317,6 +333,7 @@ export function BangladeshMap({
       <div className="map-attribution" aria-hidden>
         {t('export.madeWith')} · {mapConfig.attribution}
       </div>
+      <div ref={tooltipRef} className="map-tooltip" aria-hidden />
     </div>
   );
 }

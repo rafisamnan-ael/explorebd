@@ -121,6 +121,7 @@ export default function PlannerPage() {
         hotelTier,
         pace,
         transportPreferences: [transport],
+        destinationDistrictId: destinationDistrictIds[0],
       });
 
       setPlan({ itinerary, budget, route, orderedDistricts, days: effectiveDays, transportMode: transport, approximate: route.approximate, startName: startDistrict.nameEn });
