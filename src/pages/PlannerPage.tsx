@@ -1,158 +1,127 @@
-import { useRef, useState } from 'react';
-import { Check, Loader2, Sparkles, Wand2 } from 'lucide-react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { Loader2, Minus, Plus, MapPin, Star, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
 import { useI18n } from '@/i18n';
-import { districts, getDistrict } from '@/data/districts';
-import { places, placesForDistrict } from '@/data/places';
-import { interestOptions } from '@/data/seasons';
-import { useStatusMap } from '@/hooks/useStatusMap';
+import { getDistrict } from '@/data/districts';
+import { placesForDistrict } from '@/data/places';
+import { useSettingsStore } from '@/store/settingsStore';
 import { useUiStore } from '@/store/uiStore';
-import { getRoutingProvider, optimizeOrder } from '@/lib/routing';
-import { buildItinerary } from '@/lib/planner/itinerary';
-import { computeBudget } from '@/lib/planner/budget';
-import { recommendDestinations } from '@/lib/planner/recommend';
+import { getMapTheme } from '@/lib/map/themes';
+import { useIsMobile } from '@/hooks/useMediaQuery';
+import { generateTripPlan, type GeneratedTripPlan } from '@/lib/planner/generatePlan';
+import { defaultPlannerState, loadPlannerState, savePlannerState, clearPlannerState, type PlannerState, type TravelStyle } from '@/lib/planner/plannerState';
 import { createTripDraft } from '@/lib/planner/saveTrip';
-import { printNode } from '@/lib/export/exportImage';
-import { PlanResult, type BuiltPlan } from '@/components/planner/PlanResult';
+import { PlannerMap } from '@/components/planner/PlannerMap';
+import { PlannerResults } from '@/components/planner/PlannerResults';
+import { DistrictCombobox } from '@/components/planner/DistrictCombobox';
+import { Modal } from '@/components/ui/Modal';
 import { PageHero } from '@/components/common/Chrome';
-import type { GroupType, HotelTier, Pace, TransportMode } from '@/types';
 
-const interestKeys = interestOptions;
+function Numbered({ n, title, hint, children }: { n: number; title: string; hint?: string; children: ReactNode }) {
+  return (
+    <section className="planner-section">
+      <div className="planner-section-head">
+        <span className="planner-num">{n}</span>
+        <div>
+          <h2>{title}</h2>
+          {hint ? <p className="muted">{hint}</p> : null}
+        </div>
+      </div>
+      <div className="planner-section-body">{children}</div>
+    </section>
+  );
+}
 
 export default function PlannerPage() {
-  const { t } = useI18n();
-  const statusMap = useStatusMap();
+  const { t, shortLocale, formatCurrency } = useI18n();
+  const isMobile = useIsMobile();
+  const settings = useSettingsStore((s) => s.settings);
   const toast = useUiStore((s) => s.toast);
-  const resultRef = useRef<HTMLDivElement>(null);
+  const theme = getMapTheme(settings?.mapThemeId ?? 'forest');
 
-  const [step, setStep] = useState(0);
-  const [startDistrictId, setStartDistrictId] = useState('bd-dhaka');
-  const [destinationDistrictIds, setDestinationDistrictIds] = useState<string[]>([]);
-  const [placeIds, setPlaceIds] = useState<string[]>([]);
-  const [useDates, setUseDates] = useState(false);
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [days, setDays] = useState(2);
-  const [pace, setPace] = useState<Pace>('balanced');
-  const [groupType, setGroupType] = useState<GroupType>('friends');
-  const [travelerCount, setTravelerCount] = useState(2);
-  const [children, setChildren] = useState(false);
-  const [interests, setInterests] = useState<string[]>(['nature']);
-  const [budgetBdt, setBudgetBdt] = useState(15000);
-  const [hotelTier, setHotelTier] = useState<HotelTier>('mid');
-  const [transport, setTransport] = useState<TransportMode>('bus');
-  const [roundTrip, setRoundTrip] = useState(true);
+  const [state, setState] = useState<PlannerState>(defaultPlannerState);
+  const [resume, setResume] = useState<PlannerState | null>(null);
+  const [plan, setPlan] = useState<GeneratedTripPlan | null>(null);
   const [building, setBuilding] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [stale, setStale] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [plan, setPlan] = useState<BuiltPlan | null>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
-  const steps = [
-    t('planner.startTitle'),
-    t('planner.destinationTitle'),
-    t('planner.datesTitle'),
-    t('planner.peopleTitle'),
-    t('planner.budgetTitle'),
-    t('planner.buildTitle'),
-  ];
+  useEffect(() => {
+    const saved = loadPlannerState();
+    if (saved && saved.destinationDistrictIds.length && saved.originDistrictId) setResume(saved);
+  }, []);
 
-  const effectiveDays = (() => {
-    if (useDates && startDate && endDate) {
-      const diff = Math.round((new Date(endDate).getTime() - new Date(startDate).getTime()) / 86_400_000) + 1;
-      return Math.max(1, diff);
-    }
-    return days;
-  })();
-
-  const toggleDistrict = (id: string) => {
-    setDestinationDistrictIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  const update = (patch: Partial<PlannerState>) => {
+    setState((s) => ({ ...s, ...patch }));
+    setStale(true);
   };
 
-  const togglePlace = (id: string) => {
-    setPlaceIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  const toggleDestination = (id: string) => {
+    setState((s) => {
+      const has = s.destinationDistrictIds.includes(id);
+      const destinationDistrictIds = has ? s.destinationDistrictIds.filter((x) => x !== id) : [...s.destinationDistrictIds, id];
+      let manualRouteOrder = s.manualRouteOrder.filter((x) => destinationDistrictIds.includes(x));
+      for (const d of destinationDistrictIds) if (!manualRouteOrder.includes(d)) manualRouteOrder = [...manualRouteOrder, d];
+      const selectedPlaceIdsByDistrict = { ...s.selectedPlaceIdsByDistrict };
+      if (has) delete selectedPlaceIdsByDistrict[id];
+      return { ...s, destinationDistrictIds, manualRouteOrder, selectedPlaceIdsByDistrict };
+    });
+    setStale(true);
   };
 
-  const recommend = () => {
-    const recommendations = recommendDestinations(
-      {
-        places,
-        statusMap,
-        month: new Date().getMonth() + 1,
-        interests,
-        budgetBdt,
-        days: effectiveDays,
-        startDistrictId,
-        groupType,
-        pace,
-        hotelTier,
-      },
-      3,
-    );
-    setDestinationDistrictIds(recommendations.map((r) => r.district.id));
-    toast(t('recommend.title'), 'success');
-  };
+  const orderedIds = plan ? plan.routeDistrictIds : state.routeMode === 'manual' && state.manualRouteOrder.length ? state.manualRouteOrder : state.destinationDistrictIds;
 
   const build = async () => {
+    if (!state.originDistrictId) {
+      setError('planner.errNoOrigin');
+      return;
+    }
+    if (!state.destinationDistrictIds.length) {
+      setError('planner.errNoDestination');
+      return;
+    }
+    setError(null);
     setBuilding(true);
-    setPlan(null);
     try {
-      const destDistricts = destinationDistrictIds.map((id) => getDistrict(id)).filter(Boolean) as NonNullable<ReturnType<typeof getDistrict>>[];
-      const startDistrict = getDistrict(startDistrictId) ?? districts[0]!;
-      const points = [startDistrict, ...destDistricts].map((d) => ({ lat: d.lat, lng: d.lng }));
-      const provider = getRoutingProvider([transport]);
-      const matrix = await provider.matrix(points);
-      const order = optimizeOrder(matrix.durations, roundTrip);
-      const orderedDistricts = order.map((i) => [startDistrict, ...destDistricts][i]!);
-      const orderedPoints = order.map((i) => points[i]!);
-      const route = await provider.route(orderedPoints);
-
-      const placesByDistrict: Record<string, typeof places> = {};
-      for (const district of orderedDistricts) {
-        const chosen = placeIds.filter((pid) => places.find((p) => p.id === pid)?.districtId === district.id);
-        const source = chosen.length
-          ? places.filter((p) => chosen.includes(p.id))
-          : placesForDistrict(district.id).slice(0, 2);
-        if (source.length) placesByDistrict[district.id] = source;
-      }
-
-      const itinerary = buildItinerary({ orderedDistricts, placesByDistrict, dayCount: effectiveDays, pace, roundTrip });
-      const budget = computeBudget({
-        legs: route.legs,
-        days: effectiveDays,
-        travelerCount,
-        hotelTier,
-        pace,
-        transportPreferences: [transport],
-        destinationDistrictId: destinationDistrictIds[0],
-      });
-
-      setPlan({ itinerary, budget, route, orderedDistricts, days: effectiveDays, transportMode: transport, approximate: route.approximate, startName: startDistrict.nameEn });
-      setStep(5);
+      const p = await generateTripPlan(state);
+      setPlan(p);
+      setStale(false);
+      savePlannerState(state);
+      window.setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
     } catch {
-      toast(t('errors.generic'), 'danger');
+      setError('errors.generic');
     } finally {
       setBuilding(false);
     }
   };
 
-  const saveDraft = async () => {
+  const startOver = () => {
+    clearPlannerState();
+    setState(defaultPlannerState());
+    setPlan(null);
+    setConfirmOpen(false);
+    setResume(null);
+    setStale(false);
+  };
+
+  const saveTrip = async () => {
     setSaving(true);
     try {
+      const origin = getDistrict(state.originDistrictId ?? '');
+      const first = getDistrict(state.destinationDistrictIds[0] ?? '');
+      const title = `${origin?.nameEn ?? ''} → ${first?.nameEn ?? ''} · ${state.days} ${t('common.days')}`.trim();
       await createTripDraft({
-        title: `${getDistrict(startDistrictId)?.nameEn ?? 'Bangladesh'} trip`,
-        startDistrictId,
-        destinationDistrictIds,
-        placeIds,
-        startDate: useDates ? startDate : undefined,
-        endDate: useDates ? endDate : undefined,
-        days: effectiveDays,
-        travelerCount,
-        groupType,
-        children,
-        budgetBdt,
-        pace,
-        hotelTier,
-        transportPreferences: [transport],
-        interests,
-        roundTrip,
+        title,
+        startDistrictId: state.originDistrictId ?? 'bd-dhaka',
+        destinationDistrictIds: state.destinationDistrictIds,
+        placeIds: Object.values(state.selectedPlaceIdsByDistrict).flat(),
+        days: state.days,
+        travelerCount: state.travellers,
+        budgetBdt: state.totalBudget ?? undefined,
+        interests: [],
+        roundTrip: state.returnToOrigin,
       });
       toast(t('common.saved'), 'success');
     } finally {
@@ -160,249 +129,247 @@ export default function PlannerPage() {
     }
   };
 
-  const copySummary = async () => {
-    if (!plan) return;
-    const lines = [
-      `${t('planner.title')} — ${getDistrict(startDistrictId)?.nameEn}`,
-      `${t('planner.route')}: ${plan.orderedDistricts.map((d) => d.nameEn).join(' → ')}`,
-      `${t('planner.tripTotal')}: ৳${plan.budget.total}`,
-      `${t('planner.perPerson')}: ৳${plan.budget.perPerson}`,
-    ];
-    await navigator.clipboard.writeText(lines.join('\n'));
-    toast(t('common.copied'), 'success');
+  const shareTrip = async () => {
+    const route = [state.originDistrictId, ...plan?.routeDistrictIds ?? state.destinationDistrictIds].filter(Boolean).map((id) => (getDistrict(id!)?.nameEn ?? '')).join(' → ');
+    const per = plan ? `~${formatCurrency(plan.costs.perPerson.low)}/person` : '';
+    const text = `${route}\n${state.days} days · ${state.travellers} travellers\n${per}\nExploreBD`;
+    try {
+      await navigator.clipboard.writeText(text);
+      toast(t('share.captionCopied'), 'success');
+    } catch {
+      toast(t('errors.generic'), 'danger');
+    }
   };
 
-  const onPrint = () => {
-    if (resultRef.current) void printNode(resultRef.current);
+  const mapElement = (
+    <PlannerMap
+      originId={state.originDistrictId}
+      destinationIds={state.destinationDistrictIds}
+      orderedIds={orderedIds}
+      returnToOrigin={state.returnToOrigin}
+      theme={theme}
+      onDistrictClick={(id) => {
+        if (id === state.originDistrictId) return;
+        toggleDestination(id);
+      }}
+    />
+  );
+
+  const origin = getDistrict(state.originDistrictId ?? '');
+
+  const placeCheckbox = (districtId: string) => {
+    const districtPlaces = placesForDistrict(districtId);
+    if (!districtPlaces.length) return <p className="subtle" style={{ fontSize: '0.82rem' }}>{t('planner.noAttractions')}</p>;
+    const chosen = state.selectedPlaceIdsByDistrict[districtId] ?? [];
+    return (
+      <div className="attraction-list">
+        {districtPlaces.map((p) => (
+          <label key={p.id} className="attraction-item">
+            <input
+              type="checkbox"
+              checked={chosen.includes(p.id)}
+              onChange={() => {
+                setState((s) => {
+                  const cur = s.selectedPlaceIdsByDistrict[districtId] ?? [];
+                  const next = cur.includes(p.id) ? cur.filter((x) => x !== p.id) : [...cur, p.id];
+                  return { ...s, selectedPlaceIdsByDistrict: { ...s.selectedPlaceIdsByDistrict, [districtId]: next } };
+                });
+                setStale(true);
+              }}
+            />
+            <span>{shortLocale === 'bn' ? p.nameBn : p.nameEn}</span>
+            <span className="subtle">{p.categories[0]}{p.typicalDurationMinutes ? ` · ${Math.round(p.typicalDurationMinutes / 60) || 1}${shortLocale === 'bn' ? 'ঘ' : 'h'}` : ''}</span>
+          </label>
+        ))}
+      </div>
+    );
   };
 
   return (
-    <div className="container page">
-      <PageHero eyebrow={t('nav.planner')} title={t('planner.title')} body={t('planner.subtitle')} />
+    <div className="container page planner-page">
+      <PageHero eyebrow={t('planner.eyebrow')} title={t('planner.title')} body={t('planner.description')} />
 
-      <div className="wizard-head">
-        {steps.map((label, index) => (
-          <button
-            key={label}
-            type="button"
-            className="wizard-step"
-            data-active={index === step}
-            data-done={index < step}
-            onClick={() => setStep(index)}
-          >
-            <span className="wizard-step-index">{index < step ? <Check size={13} aria-hidden /> : index + 1}</span>
-            {label}
-          </button>
-        ))}
-      </div>
+      {resume ? (
+        <div className="card card-pad cluster" style={{ gap: 12, justifyContent: 'space-between', flexWrap: 'wrap', marginBottom: 20 }}>
+          <span>{t('planner.continuePrev')}</span>
+          <span className="cluster" style={{ gap: 10 }}>
+            <button type="button" className="btn btn-primary btn-sm" onClick={() => { setState(resume); setResume(null); }}>{t('planner.continue')}</button>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={() => { clearPlannerState(); setResume(null); }}>{t('planner.startNew')}</button>
+          </span>
+        </div>
+      ) : null}
 
-      <div className="card card-pad wizard-body">
-        {step === 0 ? (
-          <div className="stack" style={{ gap: 16 }}>
-            <h3>{t('planner.startTitle')}</h3>
-            <p className="muted">{t('planner.startSubtitle')}</p>
-            <div className="field" style={{ maxWidth: 420 }}>
-              <label className="field-label" htmlFor="planner-start">{t('planner.startDistrict')}</label>
-              <select id="planner-start" className="select" value={startDistrictId} onChange={(e) => setStartDistrictId(e.target.value)}>
-                {districts.map((d) => (
-                  <option key={d.id} value={d.id}>{d.nameEn} — {d.nameBn}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-        ) : null}
-
-        {step === 1 ? (
-          <div className="stack" style={{ gap: 16 }}>
-            <h3>{t('planner.destinationTitle')}</h3>
-            <p className="muted">{t('planner.destinationSubtitle')}</p>
-            <div className="cluster" style={{ gap: 10 }}>
-              <button type="button" className="btn btn-secondary btn-sm" onClick={recommend}>
-                <Wand2 size={15} aria-hidden /> {t('planner.recommendForMe')}
-              </button>
-              <span className="muted" style={{ fontSize: '0.85rem' }}>{t('common.selected', { count: destinationDistrictIds.length })}</span>
-            </div>
-            <div className="pill-row" style={{ maxHeight: 220, overflow: 'auto' }}>
-              {districts.filter((d) => d.id !== startDistrictId).map((d) => (
-                <button key={d.id} type="button" className="chip" aria-pressed={destinationDistrictIds.includes(d.id)} onClick={() => toggleDistrict(d.id)}>
-                  {d.nameEn}
-                </button>
-              ))}
-            </div>
-            {destinationDistrictIds.length ? (
-              <div className="stack" style={{ gap: 12 }}>
-                <h4>{t('planner.chosenPlaces')}</h4>
-                {destinationDistrictIds.map((id) => {
-                  const dc = getDistrict(id);
-                  const dcPlaces = placesForDistrict(id);
-                  if (!dc || !dcPlaces.length) return null;
-                  return (
-                    <div key={id} className="stack" style={{ gap: 6 }}>
-                      <strong style={{ fontSize: '0.9rem' }}>{dc.nameEn}</strong>
-                      <div className="pill-row">
-                        {dcPlaces.map((p) => (
-                          <button key={p.id} type="button" className="chip" aria-pressed={placeIds.includes(p.id)} onClick={() => togglePlace(p.id)}>
-                            {p.nameEn}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
+      <div className="planner-workspace">
+        <div className="planner-controls">
+          <Numbered n={1} title={t('planner.s1')} hint={t('planner.s1Hint')}>
+            {origin ? (
+              <div className="planner-origin cluster" style={{ gap: 10, justifyContent: 'space-between' }}>
+                <span className="cluster" style={{ gap: 8 }}>
+                  <span className="planner-origin-icon"><MapPin size={16} aria-hidden /></span>
+                  <span>
+                    <strong>{shortLocale === 'bn' ? origin.nameBn : origin.nameEn}</strong>
+                    <span className="muted" style={{ display: 'block', fontSize: '0.8rem' }}>{shortLocale === 'bn' ? origin.divisionNameBn : origin.divisionNameEn}</span>
+                  </span>
+                </span>
+                <Star size={16} aria-hidden style={{ color: 'var(--brass)' }} />
               </div>
             ) : null}
-          </div>
-        ) : null}
+            <DistrictCombobox
+              id="planner-origin"
+              placeholder={t('planner.originPlaceholder')}
+              excludeIds={[state.originDistrictId ?? '']}
+              onSelect={(id) => {
+                update({ originDistrictId: id, destinationDistrictIds: state.destinationDistrictIds.filter((x) => x !== id) });
+              }}
+            />
+          </Numbered>
 
-        {step === 2 ? (
-          <div className="stack" style={{ gap: 16 }}>
-            <h3>{t('planner.datesTitle')}</h3>
-            <p className="muted">{t('planner.datesSubtitle')}</p>
-            <div className="pill-row">
-              <button type="button" className="chip" aria-pressed={!useDates} onClick={() => setUseDates(false)}>{t('planner.useDays')}</button>
-              <button type="button" className="chip" aria-pressed={useDates} onClick={() => setUseDates(true)}>{t('planner.useDates')}</button>
-            </div>
-            {useDates ? (
-              <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
-                <div className="field">
-                  <label className="field-label" htmlFor="p-start">{t('planner.startDate')}</label>
-                  <input id="p-start" type="date" className="input" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-                </div>
-                <div className="field">
-                  <label className="field-label" htmlFor="p-end">{t('planner.endDate')}</label>
-                  <input id="p-end" type="date" className="input" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-                </div>
-              </div>
-            ) : (
-              <div className="field" style={{ maxWidth: 220 }}>
-                <label className="field-label" htmlFor="p-days">{t('planner.numberOfDays')}</label>
-                <input id="p-days" type="number" min={1} max={30} className="input" value={days} onChange={(e) => setDays(Number(e.target.value))} />
-              </div>
-            )}
-            <div className="field">
-              <span className="field-label">{t('planner.pace')}</span>
-              <div className="pill-row">
-                {(['relaxed', 'balanced', 'packed'] as Pace[]).map((p) => (
-                  <button key={p} type="button" className="chip" aria-pressed={pace === p} onClick={() => setPace(p)}>
-                    {t(`planner.pace${p.charAt(0).toUpperCase()}${p.slice(1)}`)}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        ) : null}
+          <Numbered n={2} title={t('planner.s2')} hint={t('planner.s2Hint')}>
+            <DistrictCombobox id="planner-dest" placeholder={t('planner.destinationPlaceholder')} excludeIds={[state.originDistrictId ?? '', ...state.destinationDistrictIds]} onSelect={toggleDestination} />
+            {state.destinationDistrictIds.length ? (
+              <ol className="destination-chips">
+                {state.destinationDistrictIds.map((id, i) => {
+                  const d = getDistrict(id);
+                  return (
+                    <li key={id} className="destination-chip">
+                      <span className="destination-chip-num">{i + 1}</span>
+                      <span>{d ? (shortLocale === 'bn' ? d.nameBn : d.nameEn) : id}</span>
+                      <button type="button" aria-label={t('common.remove')} onClick={() => toggleDestination(id)}><Trash2 size={14} aria-hidden /></button>
+                    </li>
+                  );
+                })}
+              </ol>
+            ) : null}
+            {state.destinationDistrictIds.map((id) => {
+              const d = getDistrict(id);
+              return (
+                <details key={id} className="attraction-details">
+                  <summary>{t('planner.attractionsIn', { name: d ? (shortLocale === 'bn' ? d.nameBn : d.nameEn) : id })}</summary>
+                  {placeCheckbox(id)}
+                </details>
+              );
+            })}
+          </Numbered>
 
-        {step === 3 ? (
-          <div className="stack" style={{ gap: 16 }}>
-            <h3>{t('planner.peopleTitle')}</h3>
-            <p className="muted">{t('planner.peopleSubtitle')}</p>
-            <div className="field">
-              <span className="field-label">{t('planner.groupType')}</span>
-              <div className="pill-row">
-                {(['solo', 'couple', 'family', 'friends'] as GroupType[]).map((g) => (
-                  <button key={g} type="button" className="chip" aria-pressed={groupType === g} onClick={() => setGroupType(g)}>
-                    {t(`planner.group${g.charAt(0).toUpperCase()}${g.slice(1)}`)}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="field" style={{ maxWidth: 220 }}>
-              <label className="field-label" htmlFor="p-travelers">{t('planner.travelerCount')}</label>
-              <input id="p-travelers" type="number" min={1} max={40} className="input" value={travelerCount} onChange={(e) => setTravelerCount(Number(e.target.value))} />
-            </div>
+          {isMobile ? <div className="planner-map planner-map-inline">{mapElement}</div> : null}
+
+          <Numbered n={3} title={t('planner.s3')}>
             <label className="cluster" style={{ gap: 8, fontWeight: 600 }}>
-              <input type="checkbox" checked={children} onChange={(e) => setChildren(e.target.checked)} />
-              {t('planner.withChildren')}
+              <input type="radio" checked={state.routeMode === 'optimized'} onChange={() => update({ routeMode: 'optimized' })} />
+              {t('planner.smartRoute')}
             </label>
-            <div className="field">
-              <span className="field-label">{t('planner.interests')}</span>
-              <div className="pill-row">
-                {interestKeys.map((interest) => (
-                  <button key={interest} type="button" className="chip" aria-pressed={interests.includes(interest)} onClick={() => setInterests((prev) => prev.includes(interest) ? prev.filter((x) => x !== interest) : [...prev, interest])}>
-                    {interest}
-                  </button>
+            {state.routeMode === 'manual' ? (
+              <ol className="route-order-list">
+                {state.manualRouteOrder.map((id, i) => (
+                  <li key={id}>
+                    <span className="route-order-index">{i + 1}</span>
+                    <span>{getDistrict(id)?.[shortLocale === 'bn' ? 'nameBn' : 'nameEn']}</span>
+                    <span className="cluster" style={{ gap: 4 }}>
+                      <button type="button" className="btn-icon" aria-label="up" disabled={i === 0} onClick={() => {
+                        const next = [...state.manualRouteOrder];
+                        [next[i - 1], next[i]] = [next[i]!, next[i - 1]!];
+                        update({ manualRouteOrder: next });
+                      }}><ArrowUp size={14} aria-hidden /></button>
+                      <button type="button" className="btn-icon" aria-label="down" disabled={i === state.manualRouteOrder.length - 1} onClick={() => {
+                        const next = [...state.manualRouteOrder];
+                        [next[i + 1], next[i]] = [next[i]!, next[i + 1]!];
+                        update({ manualRouteOrder: next });
+                      }}><ArrowDown size={14} aria-hidden /></button>
+                    </span>
+                  </li>
                 ))}
-              </div>
-            </div>
-          </div>
-        ) : null}
-
-        {step === 4 ? (
-          <div className="stack" style={{ gap: 16 }}>
-            <h3>{t('planner.budgetTitle')}</h3>
-            <p className="muted">{t('planner.budgetSubtitle')}</p>
-            <div className="field" style={{ maxWidth: 420 }}>
-              <label className="field-label" htmlFor="p-budget">{t('planner.totalBudget')}</label>
-              <input id="p-budget" type="number" min={0} step={500} className="input" value={budgetBdt} onChange={(e) => setBudgetBdt(Number(e.target.value))} />
-            </div>
-            <div className="field">
-              <span className="field-label">{t('planner.hotelTier')}</span>
-              <div className="pill-row">
-                {(['budget', 'mid', 'premium'] as HotelTier[]).map((h) => (
-                  <button key={h} type="button" className="chip" aria-pressed={hotelTier === h} onClick={() => setHotelTier(h)}>
-                    {t(`planner.hotel${h.charAt(0).toUpperCase()}${h.slice(1)}`)}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="field">
-              <span className="field-label">{t('planner.transport')}</span>
-              <div className="pill-row">
-                {(['bus', 'train', 'car', 'flight', 'any'] as TransportMode[]).map((m) => (
-                  <button key={m} type="button" className="chip" aria-pressed={transport === m} onClick={() => setTransport(m)}>
-                    {t(`planner.transport${m.charAt(0).toUpperCase()}${m.slice(1)}`)}
-                  </button>
-                ))}
-              </div>
-            </div>
+              </ol>
+            ) : null}
             <label className="cluster" style={{ gap: 8, fontWeight: 600 }}>
-              <input type="checkbox" checked={roundTrip} onChange={(e) => setRoundTrip(e.target.checked)} />
-              {t('planner.roundTrip')}
+              <input type="checkbox" checked={state.routeMode === 'manual'} onChange={(e) => update({ routeMode: e.target.checked ? 'manual' : 'optimized' })} />
+              {t('planner.manualRoute')}
             </label>
-          </div>
-        ) : null}
+          </Numbered>
 
-        {step === 5 ? (
-          <div>
-            {plan ? (
-              <div ref={resultRef}>
-                <PlanResult plan={plan} saving={saving} onSave={() => void saveDraft()} onPrint={onPrint} onCopy={() => void copySummary()} />
+          <Numbered n={4} title={t('planner.s4')}>
+            <div className="stepper">
+              <button type="button" className="btn-icon" aria-label={t('common.remove')} onClick={() => update({ days: Math.max(1, state.days - 1) })}><Minus size={16} aria-hidden /></button>
+              <span className="stepper-value">{state.days} {t('common.days')}</span>
+              <button type="button" className="btn-icon" aria-label={t('common.add')} onClick={() => update({ days: Math.min(30, state.days + 1) })}><Plus size={16} aria-hidden /></button>
+            </div>
+            <div className="field" style={{ marginTop: 12 }}>
+              <label className="field-label" htmlFor="planner-budget">{t('planner.totalBudgetOptional')}</label>
+              <div className="budget-input">
+                <span>৳</span>
+                <input id="planner-budget" type="number" min={0} className="input" value={state.totalBudget ?? ''} placeholder="20000" onChange={(e) => update({ totalBudget: e.target.value ? Number(e.target.value) : null })} />
               </div>
-            ) : (
-              <div className="stack" style={{ gap: 16, alignItems: 'center', textAlign: 'center', padding: '40px 0' }}>
-                <Sparkles size={28} aria-hidden style={{ color: 'var(--primary)' }} />
-                <h3>{t('planner.buildTitle')}</h3>
-                <p className="muted">{t('planner.buildSubtitle')}</p>
-                <button type="button" className="btn btn-primary btn-lg" onClick={() => void build()} disabled={building || destinationDistrictIds.length === 0}>
-                  {building ? <Loader2 size={18} className="spin" aria-hidden /> : <Sparkles size={18} aria-hidden />}
-                  {building ? t('common.loading') : t('planner.generate')}
-                </button>
-                {destinationDistrictIds.length === 0 ? <p className="subtle">{t('planner.emptyDestinations')}</p> : null}
-              </div>
-            )}
+            </div>
+          </Numbered>
+
+          <Numbered n={5} title={t('planner.s5')}>
+            <div className="stepper">
+              <button type="button" className="btn-icon" aria-label={t('common.remove')} onClick={() => update({ travellers: Math.max(1, state.travellers - 1) })}><Minus size={16} aria-hidden /></button>
+              <span className="stepper-value">{state.travellers} {t('common.people')}</span>
+              <button type="button" className="btn-icon" aria-label={t('common.add')} onClick={() => update({ travellers: Math.min(30, state.travellers + 1) })}><Plus size={16} aria-hidden /></button>
+            </div>
+            <div className="style-cards">
+              {(['save', 'balanced', 'comfort'] as TravelStyle[]).map((style) => (
+                <label key={style} className="style-card" data-active={state.travelStyle === style}>
+                  <input type="radio" name="style" checked={state.travelStyle === style} onChange={() => update({ travelStyle: style })} />
+                  <strong>{t(`planner.style${style.charAt(0).toUpperCase()}${style.slice(1)}`)}</strong>
+                  <span className="muted">{t(`planner.style${style.charAt(0).toUpperCase()}${style.slice(1)}Desc`)}</span>
+                </label>
+              ))}
+            </div>
+            <label className="cluster" style={{ gap: 8, fontWeight: 600, marginTop: 12 }}>
+              <input type="checkbox" checked={state.returnToOrigin} onChange={(e) => update({ returnToOrigin: e.target.checked })} />
+              {t('planner.returnOrigin')}
+            </label>
+          </Numbered>
+
+          {error ? <p className="field-error" role="alert">{t(error)}</p> : null}
+
+          <div className={`planner-cta ${isMobile ? 'planner-cta-sticky' : ''}`}>
+            <button type="button" className="btn btn-primary btn-lg btn-block" onClick={() => void build()} disabled={building}>
+              {building ? <Loader2 size={18} className="spin" aria-hidden /> : null}
+              {building ? t('planner.building') : stale && plan ? t('planner.updatePlan') : t('planner.buildCta')}
+            </button>
           </div>
+        </div>
+
+        {!isMobile ? (
+          <div className="planner-map planner-map-sticky">{mapElement}</div>
         ) : null}
       </div>
 
-      <div className="wizard-foot">
-        <button type="button" className="btn btn-secondary" disabled={step === 0} onClick={() => setStep((s) => Math.max(0, s - 1))}>
-          {t('common.back')}
-        </button>
-        {step < 4 ? (
-          <button type="button" className="btn btn-primary" onClick={() => setStep((s) => Math.min(5, s + 1))}>
-            {t('common.next')}
-          </button>
-        ) : step === 4 ? (
-          <button type="button" className="btn btn-primary" onClick={() => void build()} disabled={building || destinationDistrictIds.length === 0}>
-            {building ? <Loader2 size={16} className="spin" aria-hidden /> : <Sparkles size={16} aria-hidden />}
-            {t('planner.generate')}
-          </button>
+      <div ref={resultsRef}>
+        {plan ? (
+          <PlannerResults
+            plan={plan}
+            state={state}
+            saving={saving}
+            onUpdate={update}
+            onPrint={() => window.print()}
+            onSave={() => void saveTrip()}
+            onShare={() => void shareTrip()}
+            onStartOver={() => setConfirmOpen(true)}
+          />
         ) : (
-          <button type="button" className="btn btn-primary" onClick={() => void build()} disabled={building || destinationDistrictIds.length === 0}>
-            {t('planner.regenerate')}
-          </button>
+          <div className="planner-empty card card-pad">
+            <div className="eyebrow">{t('planner.emptyTitle')}</div>
+            <p className="muted">{t('planner.emptyBody')}</p>
+          </div>
         )}
       </div>
+
+      <Modal
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        title={t('planner.startOver')}
+        footer={
+          <>
+            <button type="button" className="btn btn-secondary" onClick={() => setConfirmOpen(false)}>{t('common.cancel')}</button>
+            <button type="button" className="btn btn-primary" onClick={startOver}>{t('planner.startOver')}</button>
+          </>
+        }
+      >
+        <p className="muted">{t('planner.startOverConfirm')}</p>
+      </Modal>
     </div>
   );
 }
