@@ -1,5 +1,6 @@
 import { useI18n } from '@/i18n';
 import { PageHero } from '@/components/common/Chrome';
+import { heroImages } from '@/data/heroImages';
 
 const dataSources = [
   {
@@ -57,7 +58,37 @@ export default function CreditsPage() {
 
       <section className="section">
         <h2 className="section-title">{t('credits.imageHeading')}</h2>
-        <p className="muted">{t('credits.noImages')}</p>
+        <div className="stack" style={{ gap: 10, marginTop: 12 }}>
+          {heroImages.map((image) => (
+            <div key={image.slug} className="card card-pad" style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+              <img
+                src={image.src}
+                alt={image.place}
+                width={96}
+                height={64}
+                loading="lazy"
+                style={{ width: 96, height: 64, objectFit: 'cover', borderRadius: 10, flexShrink: 0 }}
+              />
+              <div style={{ minWidth: 0 }}>
+                <strong style={{ fontSize: '0.92rem' }}>{image.place}</strong>
+                <div className="muted" style={{ fontSize: '0.82rem' }}>
+                  Photo: {image.author} ·{' '}
+                  {image.licenseUrl ? (
+                    <a href={image.licenseUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--primary)' }}>
+                      {image.license}
+                    </a>
+                  ) : (
+                    image.license
+                  )}{' '}
+                  ·{' '}
+                  <a href={image.sourceUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--primary)' }}>
+                    Wikimedia Commons
+                  </a>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </section>
 
       <p className="subtle" style={{ fontSize: '0.82rem' }}>

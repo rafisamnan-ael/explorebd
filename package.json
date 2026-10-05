@@ -20,7 +20,8 @@
     "scripts:sitemap": "tsx scripts/generate-sitemap.ts",
     "scripts:validate-geo": "tsx scripts/validate-geo.ts",
     "scripts:validate-content": "tsx scripts/validate-content.ts",
-    "scripts:validate": "npm run scripts:validate-geo && npm run scripts:validate-content"
+    "scripts:validate": "npm run scripts:validate-geo && npm run scripts:validate-content",
+    "scripts:hero-images": "tsx scripts/fetch-hero-images.ts"
   },
   "dependencies": {
     "@fontsource/dm-serif-display": "^5.3.0",

@@ -15,7 +15,6 @@ import {
   Users,
 } from 'lucide-react';
 import { useI18n } from '@/i18n';
-import { brand } from '@/config/brand';
 import { features } from '@/config/features';
 import { districts } from '@/data/districts';
 import { places } from '@/data/places';
@@ -27,7 +26,7 @@ import { useSettingsStore } from '@/store/settingsStore';
 import { BangladeshMap } from '@/components/maps/BangladeshMap';
 import { PlaceCard } from '@/components/guide/PlaceCard';
 import { Roulette } from '@/components/planner/Roulette';
-import { ProgressRing } from '@/components/ui/ProgressRing';
+import { HeroSlideshow } from '@/components/home/HeroSlideshow';
 import { SectionHead } from '@/components/common/Chrome';
 import type { TravelStatus } from '@/types';
 
@@ -73,60 +72,35 @@ export default function HomePage() {
 
   return (
     <div>
-      <section className="hero hero-premium">
-        <div className="container hero-grid">
+      <section className="hero hero-cinematic">
+        <HeroSlideshow />
+        <div className="container hero-cinematic-inner">
           <div className="hero-copy">
-            <span className="eyebrow hero-eyebrow">{brand.tagline}</span>
+            <span className="hero-pill">{t('home.eyebrow')}</span>
             <h1 className="display-xl">{t('home.heroTitle')}</h1>
             <p className="hero-sub">{t('home.heroSubtitle')}</p>
             <div className="hero-actions">
-              <Link to="/map" className="btn btn-primary btn-lg">
-                {t('home.ctaStartMap')}
+              <Link to="/map" className="btn hero-cta-primary btn-lg">
+                {t('home.ctaStartMap')} <ArrowRight size={18} aria-hidden />
               </Link>
-              <Link to="/planner" className="btn btn-secondary btn-lg">
+              <Link to="/planner" className="btn hero-cta-ghost btn-lg">
                 {t('home.ctaSecondary')}
               </Link>
-              <Link to="/guide" className="btn btn-ghost btn-lg">
-                {t('home.ctaExplorePlaces')}
-              </Link>
-            </div>
-            <p className="hero-support">{t('home.heroSupport')}</p>
-          </div>
-          <div className="hero-visual">
-            <div className="hero-map">
-              <BangladeshMap
-                statusMap={previewStatus}
-                theme={theme}
-                showLabels={false}
-                labelLanguage="en"
-                onDistrictClick={() => navigate('/map')}
-              />
-            </div>
-            <div className="card card-pad hero-float">
-              <ProgressRing value={hasData ? stats.travelPercent : 0.36} size={92} sublabel={t('home.statVisited')} />
-              <div style={{ marginTop: 10, fontSize: '0.8rem' }} className="muted">
-                {hasData
-                  ? t('map.progress', { visited: stats.visitedDistricts, total: stats.totalDistricts })
-                  : t('home.previewEmpty')}
-              </div>
             </div>
           </div>
         </div>
+        <a href="#map-preview" className="hero-scroll-cue" aria-label={t('home.mapPreviewCta')}>
+          <span />
+        </a>
       </section>
 
-      <section className="section">
-        <div className="container">
-          <SectionHead
-            title={t('home.mapPreviewTitle')}
-            action={
-              <Link to="/map" className="btn btn-sm btn-secondary">
-                {t('home.mapPreviewCta')} <ArrowRight size={15} aria-hidden />
-              </Link>
-            }
-          />
-          <div className="card card-pad">
+      <section className="section" id="map-preview">
+        <div className="container home-map-grid">
+          <div className="home-map-copy">
+            <h2 className="section-title">{t('home.mapPreviewTitle')}</h2>
+            <p className="muted">{t('home.mapPreviewCopy')}</p>
             {hasData ? (
-              <div className="stat-grid">
+              <div className="stat-grid" style={{ marginTop: 20 }}>
                 <div className="stat-tile">
                   <div className="stat-tile-value">{stats.visitedDistricts}</div>
                   <div className="stat-tile-label">{t('passport.districtsVisited')}</div>
@@ -145,13 +119,25 @@ export default function HomePage() {
                 </div>
               </div>
             ) : (
-              <div className="cluster" style={{ gap: 16, justifyContent: 'space-between', flexWrap: 'wrap' }}>
-                <p className="muted" style={{ maxWidth: 520 }}>{t('home.previewEmpty')}</p>
-                <Link to="/map" className="btn btn-primary">
-                  {t('home.startExploring')}
-                </Link>
-              </div>
+              <p className="muted" style={{ marginTop: 20 }}>{t('home.previewEmpty')}</p>
             )}
+            <div className="cluster" style={{ gap: 12, marginTop: 24 }}>
+              <Link to="/map" className="btn btn-primary">
+                {t('home.mapPreviewCta')}
+              </Link>
+              <Link to="/share" className="btn btn-secondary">
+                {t('share.title')}
+              </Link>
+            </div>
+          </div>
+          <div className="home-map-preview card">
+            <BangladeshMap
+              statusMap={previewStatus}
+              theme={theme}
+              showLabels={false}
+              labelLanguage="en"
+              onDistrictClick={() => navigate('/map')}
+            />
           </div>
         </div>
       </section>
@@ -277,23 +263,6 @@ export default function HomePage() {
               <Share2 size={18} aria-hidden /> {t('share.title')}
             </Link>
           </div>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="container">
-          <div className="card card-pad cluster" style={{ gap: 16, justifyContent: 'space-between', flexWrap: 'wrap' }}>
-            <div style={{ maxWidth: 640 }}>
-              <h2 className="section-title">{t('home.trustTitle')}</h2>
-              <p className="muted">{t('home.trustBody')}</p>
-            </div>
-            <Link to="/credits" className="btn btn-secondary">
-              {t('home.viewCredits')}
-            </Link>
-          </div>
-          <p className="subtle" style={{ marginTop: 20, fontSize: '0.8rem' }}>
-            {brand.name} · {t('home.eyebrow')}
-          </p>
         </div>
       </section>
     </div>
