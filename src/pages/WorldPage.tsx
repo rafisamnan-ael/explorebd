@@ -60,6 +60,8 @@ export default function WorldPage() {
   };
 
   const handleSelect = (countryId: string) => {
+    const current = statusMap[countryId] ?? 'unvisited';
+    if (current === 'unvisited') void setCountryStatus(countryId, 'visited');
     setSelected(countryId);
     if (isMobile) setSheetOpen(true);
   };
@@ -162,6 +164,16 @@ export default function WorldPage() {
             </div>
             <div className="progress">
               <span style={{ width: `${Math.round((visitedCount / countries.length) * 100)}%` }} />
+            </div>
+            <div className="cluster" style={{ gap: 8 }}>
+              <span className="badge badge-primary">
+                <span className="status-dot" style={{ background: 'var(--status-visited)' }} aria-hidden />
+                {t('status.visited')} · {visitedCount}
+              </span>
+              <span className="badge">
+                <span className="status-dot" style={{ background: 'var(--status-unvisited)' }} aria-hidden />
+                {t('status.unvisited')} · {countries.length - visitedCount}
+              </span>
             </div>
           </div>
           <div className="map-panel-section">{listSection}</div>

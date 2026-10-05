@@ -112,6 +112,8 @@ export default function MapPage() {
   };
 
   const selectDistrict = (districtId: string) => {
+    const current = statusMap[districtId] ?? 'unvisited';
+    if (current === 'unvisited') void setStatus(districtId, 'visited');
     setSelectedId(districtId);
     if (isMobile) setPanel('list');
   };
@@ -177,6 +179,16 @@ export default function MapPage() {
         <aside className="map-panel" aria-label={t('map.districtList')}>
           <div className="map-panel-section">
             <ProgressSummary visited={stats.visitedDistricts} total={stats.totalDistricts} percent={stats.travelPercent} />
+            <div className="cluster" style={{ gap: 8 }}>
+              <span className="badge badge-primary">
+                <span className="status-dot" style={{ background: 'var(--status-visited)' }} aria-hidden />
+                {t('status.visited')} · {stats.visitedDistricts}
+              </span>
+              <span className="badge">
+                <span className="status-dot" style={{ background: 'var(--status-unvisited)' }} aria-hidden />
+                {t('status.unvisited')} · {stats.totalDistricts - stats.visitedDistricts}
+              </span>
+            </div>
             <div className="cluster" style={{ gap: 8 }}>
               <button
                 type="button"

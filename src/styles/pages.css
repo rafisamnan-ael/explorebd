@@ -587,6 +587,9 @@
   grid-template-columns: 1fr;
   gap: var(--space-4);
 }
+.map-workspace > .map-stage {
+  order: -1;
+}
 .map-stage {
   position: relative;
   border: 1px solid var(--border);
@@ -600,6 +603,11 @@
   .map-workspace {
     grid-template-columns: 360px minmax(0, 1fr);
     align-items: start;
+  }
+  .map-workspace > .map-stage {
+    order: 0;
+    position: sticky;
+    top: calc(var(--header-h) + 16px);
   }
   .map-panel-section .panel-scroll {
     max-height: 34vh;
