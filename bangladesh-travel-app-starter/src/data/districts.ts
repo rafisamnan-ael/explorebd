@@ -1,0 +1,85 @@
+export type District = {
+  id: string;
+  name: string;
+  bnName: string;
+  division: string;
+  lat: number;
+  lng: number;
+};
+
+// Centroids are intentionally approximate in this starter. Replace with your licensed/verified dataset.
+export const districts: District[] = [
+  ['dhaka','Dhaka','ঢাকা','Dhaka',23.8103,90.4125],
+  ['faridpur','Faridpur','ফরিদপুর','Dhaka',23.6071,89.8429],
+  ['gazipur','Gazipur','গাজীপুর','Dhaka',24.0023,90.4264],
+  ['gopalganj','Gopalganj','গোপালগঞ্জ','Dhaka',23.0051,89.8266],
+  ['kishoreganj','Kishoreganj','কিশোরগঞ্জ','Dhaka',24.4260,90.9821],
+  ['madaripur','Madaripur','মাদারীপুর','Dhaka',23.1641,90.1897],
+  ['manikganj','Manikganj','মানিকগঞ্জ','Dhaka',23.8617,90.0003],
+  ['munshiganj','Munshiganj','মুন্সীগঞ্জ','Dhaka',23.5422,90.5305],
+  ['narayanganj','Narayanganj','নারায়ণগঞ্জ','Dhaka',23.6238,90.5000],
+  ['narsingdi','Narsingdi','নরসিংদী','Dhaka',23.9193,90.7176],
+  ['rajbari','Rajbari','রাজবাড়ী','Dhaka',23.7574,89.6445],
+  ['shariatpur','Shariatpur','শরীয়তপুর','Dhaka',23.2423,90.4348],
+  ['tangail','Tangail','টাঙ্গাইল','Dhaka',24.2513,89.9167],
+  ['bandarban','Bandarban','বান্দরবান','Chattogram',22.1953,92.2184],
+  ['brahmanbaria','Brahmanbaria','ব্রাহ্মণবাড়িয়া','Chattogram',23.9571,91.1119],
+  ['chandpur','Chandpur','চাঁদপুর','Chattogram',23.2333,90.6713],
+  ['chattogram','Chattogram','চট্টগ্রাম','Chattogram',22.3569,91.7832],
+  ['coxsbazar','Cox\'s Bazar','কক্সবাজার','Chattogram',21.4272,92.0058],
+  ['cumilla','Cumilla','কুমিল্লা','Chattogram',23.4607,91.1809],
+  ['feni','Feni','ফেনী','Chattogram',23.0159,91.3976],
+  ['khagrachhari','Khagrachhari','খাগড়াছড়ি','Chattogram',23.1193,91.9847],
+  ['lakshmipur','Lakshmipur','লক্ষ্মীপুর','Chattogram',22.9447,90.8282],
+  ['noakhali','Noakhali','নোয়াখালী','Chattogram',22.8696,91.0994],
+  ['rangamati','Rangamati','রাঙ্গামাটি','Chattogram',22.7324,92.2985],
+  ['bagerhat','Bagerhat','বাগেরহাট','Khulna',22.6602,89.7854],
+  ['chuadanga','Chuadanga','চুয়াডাঙ্গা','Khulna',23.6402,88.8418],
+  ['jashore','Jashore','যশোর','Khulna',23.1664,89.2081],
+  ['jhenaidah','Jhenaidah','ঝিনাইদহ','Khulna',23.5448,89.1539],
+  ['khulna','Khulna','খুলনা','Khulna',22.8456,89.5403],
+  ['kushtia','Kushtia','কুষ্টিয়া','Khulna',23.9013,89.1205],
+  ['magura','Magura','মাগুরা','Khulna',23.4855,89.4198],
+  ['meherpur','Meherpur','মেহেরপুর','Khulna',23.7622,88.6318],
+  ['narail','Narail','নড়াইল','Khulna',23.1725,89.5127],
+  ['satkhira','Satkhira','সাতক্ষীরা','Khulna',22.7185,89.0705],
+  ['joypurhat','Joypurhat','জয়পুরহাট','Rajshahi',25.0968,89.0227],
+  ['bogura','Bogura','বগুড়া','Rajshahi',24.8465,89.3773],
+  ['naogaon','Naogaon','নওগাঁ','Rajshahi',24.7936,88.9318],
+  ['natore','Natore','নাটোর','Rajshahi',24.4206,89.0003],
+  ['chapainawabganj','Chapainawabganj','চাঁপাইনবাবগঞ্জ','Rajshahi',24.5965,88.2775],
+  ['pabna','Pabna','পাবনা','Rajshahi',24.0064,89.2372],
+  ['rajshahi','Rajshahi','রাজশাহী','Rajshahi',24.3745,88.6042],
+  ['sirajganj','Sirajganj','সিরাজগঞ্জ','Rajshahi',24.4534,89.7007],
+  ['dinajpur','Dinajpur','দিনাজপুর','Rangpur',25.6279,88.6332],
+  ['gaibandha','Gaibandha','গাইবান্ধা','Rangpur',25.3288,89.5288],
+  ['kurigram','Kurigram','কুড়িগ্রাম','Rangpur',25.8054,89.6362],
+  ['lalmonirhat','Lalmonirhat','লালমনিরহাট','Rangpur',25.9172,89.4459],
+  ['nilphamari','Nilphamari','নীলফামারী','Rangpur',25.9318,88.8560],
+  ['panchagarh','Panchagarh','পঞ্চগড়','Rangpur',26.3411,88.5542],
+  ['rangpur','Rangpur','রংপুর','Rangpur',25.7439,89.2752],
+  ['thakurgaon','Thakurgaon','ঠাকুরগাঁও','Rangpur',26.0337,88.4617],
+  ['habiganj','Habiganj','হবিগঞ্জ','Sylhet',24.3749,91.4155],
+  ['moulvibazar','Moulvibazar','মৌলভীবাজার','Sylhet',24.4829,91.7774],
+  ['sunamganj','Sunamganj','সুনামগঞ্জ','Sylhet',25.0658,91.3950],
+  ['sylhet','Sylhet','সিলেট','Sylhet',24.8949,91.8687],
+  ['barguna','Barguna','বরগুনা','Barishal',22.1592,90.1256],
+  ['barishal','Barishal','বরিশাল','Barishal',22.7010,90.3535],
+  ['bhola','Bhola','ভোলা','Barishal',22.6859,90.6482],
+  ['jhalokati','Jhalokati','ঝালকাঠি','Barishal',22.6406,90.1987],
+  ['patuakhali','Patuakhali','পটুয়াখালী','Barishal',22.3596,90.3299],
+  ['pirojpur','Pirojpur','পিরোজপুর','Barishal',22.5791,89.9759],
+  ['jamalpur','Jamalpur','জামালপুর','Mymensingh',24.9375,89.9378],
+  ['mymensingh','Mymensingh','ময়মনসিংহ','Mymensingh',24.7471,90.4203],
+  ['netrokona','Netrokona','নেত্রকোণা','Mymensingh',24.8709,90.7279],
+  ['sherpur','Sherpur','শেরপুর','Mymensingh',25.0205,90.0153]
+].map(([id,name,bnName,division,lat,lng]) => ({
+  id: id as string,
+  name: name as string,
+  bnName: bnName as string,
+  division: division as string,
+  lat: lat as number,
+  lng: lng as number,
+}));
+
+export const divisions = Array.from(new Set(districts.map(d => d.division)));

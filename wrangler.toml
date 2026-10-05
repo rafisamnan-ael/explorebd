@@ -1,0 +1,32 @@
+name = "explorebd-api"
+main = "worker/index.ts"
+compatibility_date = "2024-11-01"
+workers_dev = true
+
+# Front-end static assets are deployed separately (Pages or Workers static assets).
+# Set the production route/domain when ready.
+
+[vars]
+ENVIRONMENT = "development"
+ALLOWED_ORIGINS = "http://localhost:5173"
+ROUTING_PROVIDER = "openrouteservice"
+WEATHER_PROVIDER = "disabled"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "explorebd"
+database_id = "replace-with-your-d1-id"
+migrations_dir = "migrations"
+
+# Optional object storage for share cards / media
+# [[r2_buckets]]
+# binding = "SHARE_CARDS"
+# bucket_name = "explorebd-share-cards"
+
+# Optional KV for rate limiting
+# [[kv_namespaces]]
+# binding = "RATE_LIMIT"
+# id = "replace-with-your-kv-id"
+
+[observability]
+enabled = true

@@ -1,0 +1,2 @@
+id,slug,districtId,nameEn,nameBn,shortDescriptionEn,shortDescriptionBn,categories,interests,bestMonths,typicalDurationMinutes,costMinBdt,costMaxBdt,costBasis,lat,lng,familyFriendly,sourceName,sourceUrl,verifiedAt,confidence,published
+p-example,example-place,bd-dhaka,Example Place,উদাহরণ স্থান,A short original description.,সংক্ষিপ্ত মৌলিক বিবরণ।,heritage|city,history|photography,11|12|1|2,90,20,100,entry,23.7,90.4,true,Example source,https://example.org,2026-01-01,medium,true

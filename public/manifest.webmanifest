@@ -1,0 +1,25 @@
+{
+  "name": "ExploreBD — Bangladesh Travel",
+  "short_name": "ExploreBD",
+  "description": "Track the districts you have explored, discover where to go next, plan trips and share your Bangladesh travel story. এক্সপ্লোর বিডি।",
+  "lang": "bn-BD",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#F7F9F6",
+  "theme_color": "#116149",
+  "categories": ["travel", "navigation", "lifestyle"],
+  "icons": [
+    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Bangladesh map", "url": "/map" },
+    { "name": "Trip planner", "url": "/planner" },
+    { "name": "Travel passport", "url": "/passport" }
+  ]
+}

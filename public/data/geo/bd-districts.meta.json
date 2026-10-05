@@ -1,0 +1,9 @@
+{
+  "source": "geoBoundaries gbOpen Bangladesh ADM2",
+  "sourceUrl": "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/9469f09/releaseData/gbOpen/BGD/ADM2/geoBoundaries-BGD-ADM2_simplified.geojson",
+  "sourceLicense": "CC BY 4.0",
+  "sourceAttribution": "Boundaries © geoBoundaries (geoboundaries.org), CC BY 4.0. Underlying: Bangladesh Bureau of Statistics (BBS) / OCHA ROAP.",
+  "attributeSource": "open-admin-data/bangladesh-administrative-divisions",
+  "featureCount": 64,
+  "generatedAt": "2026-10-05T05:08:41.096Z"
+}

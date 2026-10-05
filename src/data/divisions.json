@@ -1,0 +1,74 @@
+[
+  {
+    "id": "bd-div-barishal",
+    "code": "BD10",
+    "nameEn": "Barishal",
+    "nameBn": "বরিশাল",
+    "slug": "barishal",
+    "lat": 22.393,
+    "lng": 90.406
+  },
+  {
+    "id": "bd-div-chattogram",
+    "code": "BD20",
+    "nameEn": "Chattogram",
+    "nameBn": "চট্টগ্রাম",
+    "slug": "chattogram",
+    "lat": 22.701,
+    "lng": 91.706
+  },
+  {
+    "id": "bd-div-dhaka",
+    "code": "BD30",
+    "nameEn": "Dhaka",
+    "nameBn": "ঢাকা",
+    "slug": "dhaka",
+    "lat": 23.839,
+    "lng": 90.242
+  },
+  {
+    "id": "bd-div-khulna",
+    "code": "BD40",
+    "nameEn": "Khulna",
+    "nameBn": "খুলনা",
+    "slug": "khulna",
+    "lat": 22.838,
+    "lng": 89.305
+  },
+  {
+    "id": "bd-div-mymensingh",
+    "code": "BD45",
+    "nameEn": "Mymensingh",
+    "nameBn": "ময়মনসিংহ",
+    "slug": "mymensingh",
+    "lat": 24.848,
+    "lng": 90.382
+  },
+  {
+    "id": "bd-div-rajshahi",
+    "code": "BD50",
+    "nameEn": "Rajshahi",
+    "nameBn": "রাজশাহী",
+    "slug": "rajshahi",
+    "lat": 24.589,
+    "lng": 89.046
+  },
+  {
+    "id": "bd-div-rangpur",
+    "code": "BD55",
+    "nameEn": "Rangpur",
+    "nameBn": "রংপুর",
+    "slug": "rangpur",
+    "lat": 25.78,
+    "lng": 89.054
+  },
+  {
+    "id": "bd-div-sylhet",
+    "code": "BD60",
+    "nameEn": "Sylhet",
+    "nameBn": "সিলেট",
+    "slug": "sylhet",
+    "lat": 24.715,
+    "lng": 91.665
+  }
+]

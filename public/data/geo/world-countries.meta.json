@@ -1,0 +1,9 @@
+{
+  "source": "Natural Earth 1:110m Admin 0 – Countries",
+  "sourceUrl": "https://www.naturalearthdata.com/downloads/110m-cultural-vectors/",
+  "repository": "https://github.com/nvkelso/natural-earth-vector",
+  "sourceLicense": "Public domain",
+  "featureCount": 177,
+  "note": "Small states may be omitted at the 1:110m scale. Used only for the world travel map.",
+  "generatedAt": "2026-10-05"
+}
