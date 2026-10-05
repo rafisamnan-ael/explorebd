@@ -24,6 +24,7 @@ interface ShareCardProps {
   total: number;
   unit: string;
   url: string;
+  percentLabel?: string;
   displayName?: string;
   showLabels?: boolean;
   texture?: boolean;
@@ -46,6 +47,7 @@ export function ShareCard({
   total,
   unit,
   url,
+  percentLabel = 'completed',
   displayName,
   showLabels = true,
   texture,
@@ -76,11 +78,11 @@ export function ShareCard({
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        background: theme.background,
+        background: `linear-gradient(180deg, ${theme.background} 0%, color-mix(in srgb, ${theme.background} 84%, ${theme.titleColor}) 100%)`,
         fontFamily: 'Inter, "Noto Sans Bengali", system-ui, sans-serif',
       }}
     >
-      {/* Top band: tag + optional name (left), bold visited count (right) */}
+      {/* Top: tag + optional name (left), bold visited count (right) */}
       <div
         style={{
           flexShrink: 0,
@@ -89,8 +91,6 @@ export function ShareCard({
           alignItems: 'flex-start',
           justifyContent: 'space-between',
           gap: 16,
-          background: theme.panel,
-          borderBottom: `1px solid ${theme.districtStroke}`,
         }}
       >
         <div style={{ minWidth: 0 }}>
@@ -108,7 +108,7 @@ export function ShareCard({
         </div>
       </div>
 
-      {/* Map region — its own space, never covered by the bands */}
+      {/* Map region — its own space, never covered */}
       <div ref={mapRef} style={{ flex: 1, minHeight: 0, position: 'relative', overflow: 'hidden' }}>
         {mapSize.width > 0 && mapSize.height > 0 ? (
           <ExportMap
@@ -124,13 +124,11 @@ export function ShareCard({
         ) : null}
       </div>
 
-      {/* Bottom band: colourful progress bar + percentage + url */}
+      {/* Bottom: colourful progress bar + percentage + url */}
       <div
         style={{
           flexShrink: 0,
           padding: `${s.pad * 0.85}px ${s.pad}px ${s.pad}px`,
-          background: theme.panel,
-          borderTop: `1px solid ${theme.districtStroke}`,
         }}
       >
         <div
@@ -155,7 +153,7 @@ export function ShareCard({
             fontSize: s.small,
           }}
         >
-          <span style={{ fontWeight: 800, color: theme.titleColor }}>{percent}% completed</span>
+          <span style={{ fontWeight: 800, color: theme.titleColor }}>{percent}% {percentLabel}</span>
           <span style={{ letterSpacing: '0.02em' }}>{url}</span>
         </div>
       </div>

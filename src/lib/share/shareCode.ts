@@ -85,22 +85,44 @@ export interface CaptionStats {
   percent: number;
 }
 
-export function buildShareCaption(locale: 'bn' | 'en', stats: CaptionStats, scope: ShareScope = 'bd'): string {
+export function buildShareCaption(
+  locale: 'bn' | 'en',
+  stats: CaptionStats,
+  scope: ShareScope = 'bd',
+  mode: 'visited' | 'wishlist' = 'visited',
+): string {
   const unitEn = scope === 'world' ? 'countries' : 'districts of Bangladesh';
   const regionEn = scope === 'world' ? 'the world' : 'Bangladesh';
   const tag = scope === 'world' ? '#ExploreBD #World #Travel' : '#ExploreBD #Bangladesh #TravelBangladesh';
+  const tagBn = scope === 'world' ? '#এক্সপ্লোরবিডি #বিশ্ব #ভ্রমণ' : '#এক্সপ্লোরবিডি #বাংলাদেশ #ভ্রমণ';
 
   if (locale === 'bn') {
-    const unitBn = scope === 'world' ? 'দেশের মধ্যে' : 'জেলার মধ্যে';
+    const unitBn = scope === 'world' ? 'দেশের' : 'জেলার';
     const regionBn = scope === 'world' ? 'বিশ্বের' : 'বাংলাদেশের';
+    if (mode === 'wishlist') {
+      return [
+        `${regionBn} ${stats.visited}টি ${unitBn} আমার ইচ্ছাতালিকায় — পরের ভ্রমণ পরিকল্পনা করছি! 🗺️`,
+        'আপনার ভ্রমণ ম্যাপ বানান ও শেয়ার করুন 👇',
+        tagBn,
+      ].join('\n');
+    }
     return [
-      `আমি ${regionBn} ${stats.total}টির ${unitBn} ${stats.visited}টি ঘুরেছি (${stats.percent}%)! 🌍`,
-      'আপনার ভ্রমণ ম্যাপ বানান ও শেয়ার করুন 👇',
-      scope === 'world' ? '#এক্সপ্লোরবিডি #বিশ্ব #ভ্রমণ' : '#এক্সপ্লোরবিডি #বাংলাদেশ #ভ্রমণ',
+      `আমি ${regionBn} ${stats.total}টির মধ্যে ${stats.visited}টি ঘুরেছি (${stats.percent}%) — ${stats.divisions}টি বিভাগ সম্পূর্ণ! 🇧🇩`,
+      'আপনার বাংলাদেশ ভ্রমণ ম্যাপ বানান ও শেয়ার করুন 👇',
+      tagBn,
     ].join('\n');
   }
+
+  if (mode === 'wishlist') {
+    return [
+      `${stats.visited} ${unitEn} on my wishlist — planning my next trips! 🗺️`,
+      `Build and share your own ${regionEn} travel map 👇`,
+      tag,
+    ].join('\n');
+  }
+
   return [
-    `I've explored ${stats.visited} of ${stats.total} ${unitEn} (${stats.percent}%)! 🌍`,
+    `I've explored ${stats.visited} of ${stats.total} ${unitEn} (${stats.percent}%)! 🇧🇩`,
     `Build and share your own ${regionEn} travel map 👇`,
     tag,
   ].join('\n');

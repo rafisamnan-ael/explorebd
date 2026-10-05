@@ -41,7 +41,7 @@ export function ExportMap({ kind, statusMap, theme, width, height, texture, show
     };
   }, [kind]);
 
-  const padding = Math.min(width, height) * (kind === 'world' ? 0.015 : 0.025);
+  const padding = Math.min(width, height) * (kind === 'world' ? 0.012 : 0.01);
   const bounds = kind === 'world' ? WORLD_BOUNDS : mapConfig.bounds;
 
   const projector = useMemo(() => createProjector(bounds, width, height, padding), [bounds, width, height, padding]);
@@ -81,7 +81,6 @@ export function ExportMap({ kind, statusMap, theme, width, height, texture, show
 
   return (
     <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Travel map" style={{ display: 'block' }}>
-      <rect width={width} height={height} fill={theme.background} />
       {texture ? <TextureBackground width={width} height={height} theme={theme} /> : null}
       <g>
         {paths.map((p) =>

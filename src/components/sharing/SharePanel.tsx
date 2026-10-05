@@ -58,18 +58,37 @@ export function SharePanel({ bdStatusMap, worldStatusMap, bdStats, worldStats, t
   const toast = useUiStore((s) => s.toast);
   const [scope, setScope] = useState<ShareScope>(defaultScope);
   const [format, setFormat] = useState<ShareFormat>('square');
+  const [mode, setMode] = useState<'visited' | 'wishlist'>('visited');
   const [showLabels, setShowLabels] = useState(true);
   const [name, setName] = useState(initialName ?? '');
   const [caption, setCaption] = useState('');
   const [busy, setBusy] = useState<string | null>(null);
   const captureRef = useRef<HTMLDivElement>(null);
 
-  const statusMap = scope === 'bd' ? bdStatusMap : worldStatusMap;
+  const scopeMap = scope === 'bd' ? bdStatusMap : worldStatusMap;
   const stats = scope === 'bd' ? bdStats : worldStats;
 
+  // "Visited" card shows the full map; "wishlist" card highlights only planned (want-to-go) places.
+  const cardStatusMap = useMemo(
+    () =>
+      mode === 'wishlist'
+        ? Object.fromEntries(Object.entries(scopeMap).filter(([, v]) => v === 'want_to_go'))
+        : scopeMap,
+    [mode, scopeMap],
+  );
+  const count =
+    mode === 'wishlist'
+      ? Object.values(scopeMap).filter((v) => v === 'want_to_go').length
+      : stats.visited;
+
+  const modeStats = useMemo(
+    () => ({ ...stats, visited: count, percent: stats.total ? Math.round((count / stats.total) * 100) : 0 }),
+    [stats, count],
+  );
+
   useEffect(() => {
-    setCaption(buildShareCaption(shortLocale, stats, scope));
-  }, [shortLocale, stats, scope]);
+    setCaption(buildShareCaption(shortLocale, modeStats, scope, mode));
+  }, [shortLocale, modeStats, scope, mode]);
 
   const unit =
     scope === 'bd'
@@ -80,10 +99,19 @@ export function SharePanel({ bdStatusMap, worldStatusMap, bdStats, worldStats, t
         ? 'দেশ'
         : 'countries';
 
-  const shareCode = useMemo(() => encodeShareMap(statusMap, name, scope), [statusMap, name, scope]);
+  const shareCode = useMemo(() => encodeShareMap(cardStatusMap, name, scope), [cardStatusMap, name, scope]);
   const shareUrl = useMemo(() => shareMapUrl(shareCode), [shareCode]);
   const siteUrl = typeof window !== 'undefined' ? window.location.host : '';
-  const tag = scope === 'bd' ? 'Exploring Bangladesh' : 'Exploring World';
+  const tag =
+    scope === 'bd'
+      ? mode === 'wishlist'
+        ? 'Planning Bangladesh'
+        : 'Exploring Bangladesh'
+      : mode === 'wishlist'
+        ? 'Planning the World'
+        : 'Exploring World';
+  const percentLabel =
+    mode === 'wishlist' ? (shortLocale === 'bn' ? 'পরিকল্পিত' : 'planned') : shortLocale === 'bn' ? 'সম্পূর্ণ' : 'completed';
   const size = shareFormatSize[format];
   const previewScale = Math.min(1, 520 / size.width);
 
@@ -91,14 +119,15 @@ export function SharePanel({ bdStatusMap, worldStatusMap, bdStats, worldStats, t
     <ShareCard
       format={format}
       kind={scope}
-      statusMap={statusMap}
+      statusMap={cardStatusMap}
       theme={theme}
       locale={shortLocale}
       tag={tag}
-      visited={stats.visited}
+      visited={count}
       total={stats.total}
       unit={unit}
       url={siteUrl}
+      percentLabel={percentLabel}
       displayName={name || undefined}
       showLabels={showLabels}
       texture
@@ -167,6 +196,19 @@ export function SharePanel({ bdStatusMap, worldStatusMap, bdStats, worldStats, t
             options={[
               { value: 'bd', label: t('map.modeBangladesh') },
               { value: 'world', label: t('map.modeWorld') },
+            ]}
+          />
+        </div>
+
+        <div className="field">
+          <span className="field-label">{t('share.cardType')}</span>
+          <Segmented
+            ariaLabel={t('share.cardType')}
+            value={mode}
+            onChange={setMode}
+            options={[
+              { value: 'visited', label: t('share.modeVisited') },
+              { value: 'wishlist', label: t('share.modeWishlist') },
             ]}
           />
         </div>
