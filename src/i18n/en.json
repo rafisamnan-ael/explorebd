@@ -187,6 +187,12 @@
     "tapDistrict": "Tap a district to mark it visited. Long-press or use the list to set another status.",
     "modeDistricts": "Districts",
     "modeUpazilas": "Upazilas",
+    "modeBangladesh": "Bangladesh · zila",
+    "modeWorld": "World · countries",
+    "modeAria": "Map mode: districts or countries",
+    "selectZilaHint": "Tap a district on the map — or use the list — to set its status.",
+    "selectCountryHint": "Tap a country on the map — or use the list — to set its status.",
+    "countryList": "Countries",
     "upazilaComingSoon": "Upazila mode is coming soon.",
     "clickHint": "Click a district on the map to edit its status",
     "statusSet": "“{name}” marked as {status}"

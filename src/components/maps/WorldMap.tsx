@@ -93,6 +93,7 @@ export function WorldMap({ statusMap, theme, onCountryClick, onBackgroundClick }
       setState('ready');
     });
     map.on('styledata', ensure);
+    map.on('idle', ensure);
     map.on('error', () => undefined);
     map.on('mousemove', (event: MapMouseEvent) => {
       const features = map.queryRenderedFeatures(event.point, { layers: ['districts-fill'] });

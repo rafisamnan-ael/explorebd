@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowRight,
   Building2,
@@ -54,6 +54,7 @@ const samplePreview: Record<string, TravelStatus> = {
 
 export default function HomePage() {
   const { t, shortLocale } = useI18n();
+  const navigate = useNavigate();
   const statusMap = useStatusMap();
   const entries = usePassportStore((s) => s.entries);
   const settings = useSettingsStore((s) => s.settings);
@@ -88,13 +89,13 @@ export default function HomePage() {
             </div>
           </div>
           <div className="hero-visual">
-            <div className="hero-map" aria-hidden>
+            <div className="hero-map">
               <BangladeshMap
                 statusMap={previewStatus}
                 theme={theme}
                 showLabels={false}
                 labelLanguage="en"
-                onDistrictClick={() => undefined}
+                onDistrictClick={() => navigate('/map')}
               />
             </div>
             <div className="card card-pad hero-float">

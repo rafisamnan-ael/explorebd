@@ -14,6 +14,7 @@ import { Sheet } from '@/components/ui/Sheet';
 import { Modal } from '@/components/ui/Modal';
 import { ExportDialog } from '@/components/sharing/ExportDialog';
 import { BangladeshMap } from '@/components/maps/BangladeshMap';
+import { MapModeSwitch } from '@/components/maps/MapModeSwitch';
 import {
   DistrictList,
   DistrictSearchInput,
@@ -150,8 +151,10 @@ export default function MapPage() {
       <div className="page-hero" style={{ paddingBottom: 20 }}>
         <span className="eyebrow">{t('home.eyebrow')}</span>
         <h1>{t('map.title')}</h1>
-        <p>{t('map.tapDistrict')}</p>
+        <p>{t('map.selectZilaHint')}</p>
       </div>
+
+      <MapModeSwitch mode="bd" />
 
       {isMobile ? (
         <div className="mobile-toolbar" role="toolbar" aria-label={t('map.title')}>

@@ -187,6 +187,7 @@ export function BangladeshMap({
       setState('ready');
     });
     map.on('styledata', ensureLayers);
+    map.on('idle', ensureLayers);
     map.on('error', onError);
     map.on('mousemove', onMouseMove);
     map.on('click', onClick);
@@ -215,8 +216,6 @@ export function BangladeshMap({
         .catch(() => {
           if (!disposed) setTilesOk(false);
         });
-    } else {
-      setTilesOk(false);
     }
 
     return () => {
@@ -310,7 +309,7 @@ export function BangladeshMap({
       ) : null}
       {!tilesOk && state === 'ready' ? <div className="map-tiles-note">{t('errors.mapTilesUnavailable')}</div> : null}
       <div className="map-attribution" aria-hidden>
-        {t('export.madeWith')} · © OpenFreeMap · © OpenStreetMap · geoBoundaries
+        {t('export.madeWith')} · {mapConfig.attribution}
       </div>
     </div>
   );

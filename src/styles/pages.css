@@ -596,6 +596,35 @@
   min-height: 340px;
   background: var(--surface-2);
 }
+@media (min-width: 960px) {
+  .map-workspace {
+    grid-template-columns: 360px minmax(0, 1fr);
+    align-items: start;
+  }
+  .map-stage {
+    position: sticky;
+    top: calc(var(--header-h) + 16px);
+    height: calc(100vh - var(--header-h) - 48px);
+    min-height: 520px;
+  }
+  .map-panel-section .panel-scroll {
+    max-height: 34vh;
+  }
+}
+
+/* Map mode switch */
+.map-mode-switch {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.country-list {
+  max-height: 42vh;
+  overflow: auto;
+}
 .map-panel {
   background: var(--surface);
   border: 1px solid var(--border);
