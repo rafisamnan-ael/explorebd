@@ -35,6 +35,11 @@ blob-report/
 .wrangler/
 .dev.vars
 
+# Vercel
+.vercel
+
 # Misc
 *.local
 *.tsbuildinfo
+
+.vercel

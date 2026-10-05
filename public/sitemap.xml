@@ -1,597 +1,597 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://explorebd.example/</loc>
+    <loc>https://explorebd-three.vercel.app/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/map</loc>
+    <loc>https://explorebd-three.vercel.app/map</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/world</loc>
+    <loc>https://explorebd-three.vercel.app/world</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide</loc>
+    <loc>https://explorebd-three.vercel.app/guide</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/famous</loc>
+    <loc>https://explorebd-three.vercel.app/famous</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/planner</loc>
+    <loc>https://explorebd-three.vercel.app/planner</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/passport</loc>
+    <loc>https://explorebd-three.vercel.app/passport</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/journal</loc>
+    <loc>https://explorebd-three.vercel.app/journal</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/games</loc>
+    <loc>https://explorebd-three.vercel.app/games</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/games/quiz</loc>
+    <loc>https://explorebd-three.vercel.app/games/quiz</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/games/map-puzzle</loc>
+    <loc>https://explorebd-three.vercel.app/games/map-puzzle</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/leaderboard</loc>
+    <loc>https://explorebd-three.vercel.app/leaderboard</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/about</loc>
+    <loc>https://explorebd-three.vercel.app/about</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/credits</loc>
+    <loc>https://explorebd-three.vercel.app/credits</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/privacy</loc>
+    <loc>https://explorebd-three.vercel.app/privacy</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/terms</loc>
+    <loc>https://explorebd-three.vercel.app/terms</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/settings</loc>
+    <loc>https://explorebd-three.vercel.app/settings</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/season/1</loc>
+    <loc>https://explorebd-three.vercel.app/season/1</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/season/2</loc>
+    <loc>https://explorebd-three.vercel.app/season/2</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/season/3</loc>
+    <loc>https://explorebd-three.vercel.app/season/3</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/season/4</loc>
+    <loc>https://explorebd-three.vercel.app/season/4</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/season/5</loc>
+    <loc>https://explorebd-three.vercel.app/season/5</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/season/6</loc>
+    <loc>https://explorebd-three.vercel.app/season/6</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/season/7</loc>
+    <loc>https://explorebd-three.vercel.app/season/7</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/season/8</loc>
+    <loc>https://explorebd-three.vercel.app/season/8</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/season/9</loc>
+    <loc>https://explorebd-three.vercel.app/season/9</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/season/10</loc>
+    <loc>https://explorebd-three.vercel.app/season/10</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/season/11</loc>
+    <loc>https://explorebd-three.vercel.app/season/11</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/season/12</loc>
+    <loc>https://explorebd-three.vercel.app/season/12</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/barguna</loc>
+    <loc>https://explorebd-three.vercel.app/guide/barguna</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/barishal</loc>
+    <loc>https://explorebd-three.vercel.app/guide/barishal</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/bhola</loc>
+    <loc>https://explorebd-three.vercel.app/guide/bhola</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/jhalokati</loc>
+    <loc>https://explorebd-three.vercel.app/guide/jhalokati</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/patuakhali</loc>
+    <loc>https://explorebd-three.vercel.app/guide/patuakhali</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/pirojpur</loc>
+    <loc>https://explorebd-three.vercel.app/guide/pirojpur</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/bandarban</loc>
+    <loc>https://explorebd-three.vercel.app/guide/bandarban</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/brahmanbaria</loc>
+    <loc>https://explorebd-three.vercel.app/guide/brahmanbaria</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/chandpur</loc>
+    <loc>https://explorebd-three.vercel.app/guide/chandpur</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/chattogram</loc>
+    <loc>https://explorebd-three.vercel.app/guide/chattogram</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/cumilla</loc>
+    <loc>https://explorebd-three.vercel.app/guide/cumilla</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/coxs-bazar</loc>
+    <loc>https://explorebd-three.vercel.app/guide/coxs-bazar</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/feni</loc>
+    <loc>https://explorebd-three.vercel.app/guide/feni</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/khagrachhari</loc>
+    <loc>https://explorebd-three.vercel.app/guide/khagrachhari</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/lakshmipur</loc>
+    <loc>https://explorebd-three.vercel.app/guide/lakshmipur</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/noakhali</loc>
+    <loc>https://explorebd-three.vercel.app/guide/noakhali</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/rangamati</loc>
+    <loc>https://explorebd-three.vercel.app/guide/rangamati</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/dhaka</loc>
+    <loc>https://explorebd-three.vercel.app/guide/dhaka</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/faridpur</loc>
+    <loc>https://explorebd-three.vercel.app/guide/faridpur</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/gazipur</loc>
+    <loc>https://explorebd-three.vercel.app/guide/gazipur</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/gopalganj</loc>
+    <loc>https://explorebd-three.vercel.app/guide/gopalganj</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/kishoreganj</loc>
+    <loc>https://explorebd-three.vercel.app/guide/kishoreganj</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/madaripur</loc>
+    <loc>https://explorebd-three.vercel.app/guide/madaripur</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/manikganj</loc>
+    <loc>https://explorebd-three.vercel.app/guide/manikganj</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/munshiganj</loc>
+    <loc>https://explorebd-three.vercel.app/guide/munshiganj</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/narayanganj</loc>
+    <loc>https://explorebd-three.vercel.app/guide/narayanganj</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/narsingdi</loc>
+    <loc>https://explorebd-three.vercel.app/guide/narsingdi</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/rajbari</loc>
+    <loc>https://explorebd-three.vercel.app/guide/rajbari</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/shariatpur</loc>
+    <loc>https://explorebd-three.vercel.app/guide/shariatpur</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/tangail</loc>
+    <loc>https://explorebd-three.vercel.app/guide/tangail</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/bagerhat</loc>
+    <loc>https://explorebd-three.vercel.app/guide/bagerhat</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/chuadanga</loc>
+    <loc>https://explorebd-three.vercel.app/guide/chuadanga</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/jashore</loc>
+    <loc>https://explorebd-three.vercel.app/guide/jashore</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/jhenaidah</loc>
+    <loc>https://explorebd-three.vercel.app/guide/jhenaidah</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/khulna</loc>
+    <loc>https://explorebd-three.vercel.app/guide/khulna</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/kushtia</loc>
+    <loc>https://explorebd-three.vercel.app/guide/kushtia</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/magura</loc>
+    <loc>https://explorebd-three.vercel.app/guide/magura</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/meherpur</loc>
+    <loc>https://explorebd-three.vercel.app/guide/meherpur</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/narail</loc>
+    <loc>https://explorebd-three.vercel.app/guide/narail</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/satkhira</loc>
+    <loc>https://explorebd-three.vercel.app/guide/satkhira</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/jamalpur</loc>
+    <loc>https://explorebd-three.vercel.app/guide/jamalpur</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/mymensingh</loc>
+    <loc>https://explorebd-three.vercel.app/guide/mymensingh</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/netrakona</loc>
+    <loc>https://explorebd-three.vercel.app/guide/netrakona</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/sherpur</loc>
+    <loc>https://explorebd-three.vercel.app/guide/sherpur</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/bogura</loc>
+    <loc>https://explorebd-three.vercel.app/guide/bogura</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/joypurhat</loc>
+    <loc>https://explorebd-three.vercel.app/guide/joypurhat</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/naogaon</loc>
+    <loc>https://explorebd-three.vercel.app/guide/naogaon</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/natore</loc>
+    <loc>https://explorebd-three.vercel.app/guide/natore</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/chapainababganj</loc>
+    <loc>https://explorebd-three.vercel.app/guide/chapainababganj</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/pabna</loc>
+    <loc>https://explorebd-three.vercel.app/guide/pabna</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/rajshahi</loc>
+    <loc>https://explorebd-three.vercel.app/guide/rajshahi</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/sirajganj</loc>
+    <loc>https://explorebd-three.vercel.app/guide/sirajganj</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/dinajpur</loc>
+    <loc>https://explorebd-three.vercel.app/guide/dinajpur</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/gaibandha</loc>
+    <loc>https://explorebd-three.vercel.app/guide/gaibandha</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/kurigram</loc>
+    <loc>https://explorebd-three.vercel.app/guide/kurigram</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/lalmonirhat</loc>
+    <loc>https://explorebd-three.vercel.app/guide/lalmonirhat</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/nilphamari</loc>
+    <loc>https://explorebd-three.vercel.app/guide/nilphamari</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/panchagarh</loc>
+    <loc>https://explorebd-three.vercel.app/guide/panchagarh</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/rangpur</loc>
+    <loc>https://explorebd-three.vercel.app/guide/rangpur</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/thakurgaon</loc>
+    <loc>https://explorebd-three.vercel.app/guide/thakurgaon</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/habiganj</loc>
+    <loc>https://explorebd-three.vercel.app/guide/habiganj</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/moulvibazar</loc>
+    <loc>https://explorebd-three.vercel.app/guide/moulvibazar</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/sunamganj</loc>
+    <loc>https://explorebd-three.vercel.app/guide/sunamganj</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/guide/sylhet</loc>
+    <loc>https://explorebd-three.vercel.app/guide/sylhet</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/lalbagh-fort</loc>
+    <loc>https://explorebd-three.vercel.app/place/lalbagh-fort</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/ahsan-manzil</loc>
+    <loc>https://explorebd-three.vercel.app/place/ahsan-manzil</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/somapura-mahavihara</loc>
+    <loc>https://explorebd-three.vercel.app/place/somapura-mahavihara</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/sixty-dome-mosque</loc>
+    <loc>https://explorebd-three.vercel.app/place/sixty-dome-mosque</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/sundarbans</loc>
+    <loc>https://explorebd-three.vercel.app/place/sundarbans</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/coxs-bazar-beach</loc>
+    <loc>https://explorebd-three.vercel.app/place/coxs-bazar-beach</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/himchari-national-park</loc>
+    <loc>https://explorebd-three.vercel.app/place/himchari-national-park</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/saint-martins-island</loc>
+    <loc>https://explorebd-three.vercel.app/place/saint-martins-island</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/patenga-beach</loc>
+    <loc>https://explorebd-three.vercel.app/place/patenga-beach</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/ratargul-swamp-forest</loc>
+    <loc>https://explorebd-three.vercel.app/place/ratargul-swamp-forest</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/jaflong</loc>
+    <loc>https://explorebd-three.vercel.app/place/jaflong</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/shahjalal-mazar</loc>
+    <loc>https://explorebd-three.vercel.app/place/shahjalal-mazar</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/lawachara-national-park</loc>
+    <loc>https://explorebd-three.vercel.app/place/lawachara-national-park</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/madhabkunda-waterfall</loc>
+    <loc>https://explorebd-three.vercel.app/place/madhabkunda-waterfall</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/nilgiri</loc>
+    <loc>https://explorebd-three.vercel.app/place/nilgiri</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/boga-lake</loc>
+    <loc>https://explorebd-three.vercel.app/place/boga-lake</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/kaptai-lake</loc>
+    <loc>https://explorebd-three.vercel.app/place/kaptai-lake</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/kuakata-beach</loc>
+    <loc>https://explorebd-three.vercel.app/place/kuakata-beach</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/puthia-temple-complex</loc>
+    <loc>https://explorebd-three.vercel.app/place/puthia-temple-complex</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/mahasthangarh</loc>
+    <loc>https://explorebd-three.vercel.app/place/mahasthangarh</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/kantanagar-temple</loc>
+    <loc>https://explorebd-three.vercel.app/place/kantanagar-temple</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/tanguar-haor</loc>
+    <loc>https://explorebd-three.vercel.app/place/tanguar-haor</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/bhawal-national-park</loc>
+    <loc>https://explorebd-three.vercel.app/place/bhawal-national-park</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/madhupur-national-park</loc>
+    <loc>https://explorebd-three.vercel.app/place/madhupur-national-park</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/mainamati</loc>
+    <loc>https://explorebd-three.vercel.app/place/mainamati</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://explorebd.example/place/alutila-cave</loc>
+    <loc>https://explorebd-three.vercel.app/place/alutila-cave</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
