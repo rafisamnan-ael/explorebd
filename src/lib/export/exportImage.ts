@@ -26,9 +26,22 @@ export function downloadDataUrl(dataUrl: string, filename: string): void {
   const link = document.createElement('a');
   link.href = dataUrl;
   link.download = filename;
+  link.rel = 'noopener';
   document.body.appendChild(link);
   link.click();
   link.remove();
+}
+
+/** Copies a PNG data URL to the clipboard (image/png). Returns false if unsupported. */
+export async function copyImageToClipboard(dataUrl: string): Promise<boolean> {
+  try {
+    if (typeof navigator === 'undefined' || !navigator.clipboard || typeof ClipboardItem === 'undefined') return false;
+    const blob = await (await fetch(dataUrl)).blob();
+    await navigator.clipboard.write([new ClipboardItem({ [blob.type || 'image/png']: blob })]);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export async function downloadPdf(node: HTMLElement, filename: string): Promise<void> {

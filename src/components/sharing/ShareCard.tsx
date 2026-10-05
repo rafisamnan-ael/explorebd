@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import type { TravelStatus } from '@/types';
 import type { MapTheme } from '@/lib/map/themes';
 import type { ShareScope } from '@/lib/share/shareCode';
@@ -29,9 +30,9 @@ interface ShareCardProps {
 }
 
 const sizeConfig: Record<ShareFormat, { tag: number; big: number; small: number; name: number; pad: number }> = {
-  social: { tag: 30, big: 52, small: 20, name: 22, pad: 32 },
-  square: { tag: 40, big: 66, small: 26, name: 28, pad: 44 },
-  story: { tag: 50, big: 84, small: 34, name: 34, pad: 60 },
+  social: { tag: 30, big: 52, small: 20, name: 22, pad: 30 },
+  square: { tag: 40, big: 66, small: 26, name: 28, pad: 42 },
+  story: { tag: 50, big: 84, small: 34, name: 34, pad: 58 },
 };
 
 export function ShareCard({
@@ -54,35 +55,35 @@ export function ShareCard({
   const percent = total > 0 ? Math.max(0, Math.min(100, Math.round((visited / total) * 100))) : 0;
   const barColor = 'linear-gradient(90deg, #278661 0%, #176b4d 38%, #c69b4b 72%, #c66245 100%)';
 
+  // Measure the map region so the map is drawn to fit exactly (never cropped by the bands).
+  const mapRef = useRef<HTMLDivElement>(null);
+  const [mapSize, setMapSize] = useState({ width: 0, height: 0 });
+  useEffect(() => {
+    const el = mapRef.current;
+    if (!el) return;
+    const update = () => setMapSize({ width: el.clientWidth, height: el.clientHeight });
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [format, kind]);
+
   return (
     <div
       style={{
         width,
         height,
-        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
         overflow: 'hidden',
         background: theme.background,
         fontFamily: 'Inter, "Noto Sans Bengali", system-ui, sans-serif',
       }}
     >
-      <ExportMap
-        kind={kind}
-        statusMap={statusMap}
-        theme={theme}
-        width={width}
-        height={height}
-        texture={texture}
-        showLabels={showLabels}
-        locale={locale}
-      />
-
-      {/* Opaque top band: tag + optional name (left), bold visited count (right) */}
+      {/* Top band: tag + optional name (left), bold visited count (right) */}
       <div
         style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
+          flexShrink: 0,
           padding: `${s.pad}px ${s.pad}px ${s.pad * 0.85}px`,
           display: 'flex',
           alignItems: 'flex-start',
@@ -97,9 +98,7 @@ export function ShareCard({
             {tag}
           </div>
           {displayName ? (
-            <div style={{ fontWeight: 700, fontSize: s.name, color: theme.subtitleColor, marginTop: s.name * 0.35 }}>
-              {displayName}
-            </div>
+            <div style={{ fontWeight: 700, fontSize: s.name, color: theme.subtitleColor, marginTop: s.name * 0.35 }}>{displayName}</div>
           ) : null}
         </div>
         <div style={{ textAlign: 'right', lineHeight: 0.95, flexShrink: 0 }}>
@@ -109,13 +108,26 @@ export function ShareCard({
         </div>
       </div>
 
-      {/* Opaque bottom band: colourful progress bar + percentage + url */}
+      {/* Map region — its own space, never covered by the bands */}
+      <div ref={mapRef} style={{ flex: 1, minHeight: 0, position: 'relative', overflow: 'hidden' }}>
+        {mapSize.width > 0 && mapSize.height > 0 ? (
+          <ExportMap
+            kind={kind}
+            statusMap={statusMap}
+            theme={theme}
+            width={mapSize.width}
+            height={mapSize.height}
+            texture={texture}
+            showLabels={showLabels}
+            locale={locale}
+          />
+        ) : null}
+      </div>
+
+      {/* Bottom band: colourful progress bar + percentage + url */}
       <div
         style={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          bottom: 0,
+          flexShrink: 0,
           padding: `${s.pad * 0.85}px ${s.pad}px ${s.pad}px`,
           background: theme.panel,
           borderTop: `1px solid ${theme.districtStroke}`,
@@ -130,7 +142,7 @@ export function ShareCard({
             boxShadow: `inset 0 0 0 1px ${theme.districtStroke}`,
           }}
         >
-          <div style={{ width: `${percent}%`, height: '100%', borderRadius: 999, background: barColor, transition: 'width 0.4s ease' }} />
+          <div style={{ width: `${percent}%`, height: '100%', borderRadius: 999, background: barColor }} />
         </div>
         <div
           style={{

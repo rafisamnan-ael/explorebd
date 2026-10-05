@@ -4,6 +4,7 @@ import {
   Download,
   Facebook,
   FileImage,
+  ClipboardCopy,
   FileText,
   Link2,
   Linkedin,
@@ -20,7 +21,7 @@ import { Segmented } from '@/components/ui/Segmented';
 import { ShareCard, shareFormatSize, type ShareFormat } from './ShareCard';
 import type { MapTheme } from '@/lib/map/themes';
 import type { TravelStatus } from '@/types';
-import { downloadDataUrl, downloadPdf, nodeToJpeg, nodeToPng, printNode } from '@/lib/export/exportImage';
+import { downloadDataUrl, downloadPdf, nodeToJpeg, nodeToPng, printNode, copyImageToClipboard } from '@/lib/export/exportImage';
 import { buildShareCaption, encodeShareMap, shareMapUrl, type ShareScope } from '@/lib/share/shareCode';
 import { dataUrlToFile, nativeShare, openShareWindow, platformShareUrl, sharePlatforms, type SharePlatform } from '@/lib/share/social';
 
@@ -133,6 +134,13 @@ export function SharePanel({ bdStatusMap, worldStatusMap, bdStats, worldStats, t
       if (!ok) toast(t('share.nativeUnsupported'));
     });
 
+  const copyImage = () =>
+    withCapture('copy', async () => {
+      const dataUrl = await nodeToPng(captureRef.current!, 2);
+      const ok = await copyImageToClipboard(dataUrl);
+      toast(ok ? t('share.imageCopied') : t('share.copyUnsupported'), ok ? 'success' : 'default');
+    });
+
   return (
     <div className="share-layout">
       <div className="share-preview">
@@ -231,7 +239,10 @@ export function SharePanel({ bdStatusMap, worldStatusMap, bdStats, worldStats, t
         <div className="stack" style={{ gap: 8 }}>
           <span className="eyebrow">{t('share.download')}</span>
           <div className="cluster" style={{ gap: 10, flexWrap: 'wrap' }}>
-            <button type="button" className="btn btn-primary btn-sm" disabled={busy === 'png'} onClick={() => void withCapture('png', async () => { const d = await nodeToPng(captureRef.current!, 2); downloadDataUrl(d, `explorebd-${scope}-${format}.png`); toast(t('export.ready'), 'success'); })}>
+            <button type="button" className="btn btn-primary btn-sm" disabled={busy === 'copy'} onClick={() => void copyImage()}>
+              {busy === 'copy' ? <Loader2 size={15} className="spin" aria-hidden /> : <ClipboardCopy size={15} aria-hidden />} {t('share.copyImage')}
+            </button>
+            <button type="button" className="btn btn-secondary btn-sm" disabled={busy === 'png'} onClick={() => void withCapture('png', async () => { const d = await nodeToPng(captureRef.current!, 2); downloadDataUrl(d, `explorebd-${scope}-${format}.png`); toast(t('export.ready'), 'success'); })}>
               {busy === 'png' ? <Loader2 size={15} className="spin" aria-hidden /> : <FileImage size={15} aria-hidden />} PNG
             </button>
             <button type="button" className="btn btn-secondary btn-sm" disabled={busy === 'jpg'} onClick={() => void withCapture('jpg', async () => { const d = await nodeToJpeg(captureRef.current!, 2); downloadDataUrl(d, `explorebd-${scope}-${format}.jpg`); toast(t('export.ready'), 'success'); })}>
