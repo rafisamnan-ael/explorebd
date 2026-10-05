@@ -26,6 +26,7 @@ export function ExportDialog({ open, onClose, bdStatusMap, worldStatusMap, bdSta
         worldStats={worldStats}
         theme={theme}
         initialName={displayName}
+        showCardType={false}
       />
     </Modal>
   );

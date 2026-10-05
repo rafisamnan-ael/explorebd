@@ -49,11 +49,13 @@ interface SharePanelProps {
   theme: MapTheme;
   initialName?: string;
   defaultScope?: ShareScope;
+  /** Show the visited/wishlist "Card type" selector (studio only, not the export dialog). */
+  showCardType?: boolean;
 }
 
 const platformName = (p: SharePlatform) => (p === 'x' ? 'X' : p.charAt(0).toUpperCase() + p.slice(1));
 
-export function SharePanel({ bdStatusMap, worldStatusMap, bdStats, worldStats, theme, initialName, defaultScope = 'bd' }: SharePanelProps) {
+export function SharePanel({ bdStatusMap, worldStatusMap, bdStats, worldStats, theme, initialName, defaultScope = 'bd', showCardType = true }: SharePanelProps) {
   const { t, shortLocale } = useI18n();
   const toast = useUiStore((s) => s.toast);
   const [scope, setScope] = useState<ShareScope>(defaultScope);
@@ -200,18 +202,20 @@ export function SharePanel({ bdStatusMap, worldStatusMap, bdStats, worldStats, t
           />
         </div>
 
-        <div className="field">
-          <span className="field-label">{t('share.cardType')}</span>
-          <Segmented
-            ariaLabel={t('share.cardType')}
-            value={mode}
-            onChange={setMode}
-            options={[
-              { value: 'visited', label: t('share.modeVisited') },
-              { value: 'wishlist', label: t('share.modeWishlist') },
-            ]}
-          />
-        </div>
+        {showCardType ? (
+          <div className="field">
+            <span className="field-label">{t('share.cardType')}</span>
+            <Segmented
+              ariaLabel={t('share.cardType')}
+              value={mode}
+              onChange={setMode}
+              options={[
+                { value: 'visited', label: t('share.modeVisited') },
+                { value: 'wishlist', label: t('share.modeWishlist') },
+              ]}
+            />
+          </div>
+        ) : null}
 
         <Segmented
           ariaLabel={t('share.preview')}
