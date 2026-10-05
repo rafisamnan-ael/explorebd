@@ -8,7 +8,9 @@ import { getMapTheme } from '@/lib/map/themes';
 import { computeStats } from '@/lib/passport/stats';
 import { buildShareCaption, decodeShareMap, encodeShareMap, shareMapUrl } from '@/lib/share/shareCode';
 import { openShareWindow, sharePlatforms } from '@/lib/share/social';
+import { countries } from '@/data/countries';
 import { BangladeshMap } from '@/components/maps/BangladeshMap';
+import { WorldMap } from '@/components/maps/WorldMap';
 import { ProgressRing } from '@/components/ui/ProgressRing';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { PageHero } from '@/components/common/Chrome';
@@ -45,43 +47,50 @@ export default function SharedMapPage() {
     );
   }
 
-  const stats = computeStats(payload.statusMap, []);
-  const shareUrl = shareMapUrl(encodeShareMap(payload.statusMap, payload.name ?? ''));
-  const caption = buildShareCaption(shortLocale, {
-    visited: stats.visitedDistricts,
-    total: stats.totalDistricts,
-    divisions: stats.divisionsComplete,
-    percent: Math.round(stats.travelPercent * 100),
-  });
+  const { scope, name, statusMap } = payload;
+  const total = scope === 'world' ? countries.length : computeStats({}, []).totalDistricts;
+  const visited = Object.values(statusMap).filter((s) => s === 'visited' || s === 'favorite' || s === 'lived_here').length;
+  const percent = total ? Math.round((visited / total) * 100) : 0;
+  const divisions = scope === 'bd' ? computeStats(statusMap, []).divisionsComplete : 0;
+  const completed = scope === 'bd' ? computeStats(statusMap, []).travelPercent : visited / total;
 
-  const title = payload.name ? t('share.viewing', { name: payload.name }) : t('share.viewingGeneric');
+  const shareUrl = shareMapUrl(encodeShareMap(statusMap, name ?? '', scope));
+  const caption = buildShareCaption(shortLocale, { visited, total, divisions, percent }, scope);
+  const title = name ? t('share.viewing', { name }) : t('share.viewingGeneric');
+  const unit = scope === 'world' ? (shortLocale === 'bn' ? 'দেশ' : 'countries') : shortLocale === 'bn' ? 'জেলা' : 'districts';
 
   return (
     <div className="container page">
-      <PageHero eyebrow={t('share.title')} title={title} body={t('share.sharedProgress', { visited: stats.visitedDistricts, total: stats.totalDistricts })} />
+      <PageHero eyebrow={t('share.title')} title={title} body={`${visited} / ${total} ${unit}`} />
 
       <div className="map-stage" style={{ marginBottom: 20 }}>
-        <BangladeshMap
-          statusMap={payload.statusMap}
-          theme={theme}
-          showLabels={settings?.showLabels ?? false}
-          labelLanguage={settings?.labelLanguage ?? 'en'}
-          ariaLabel={title}
-        />
+        {scope === 'world' ? (
+          <WorldMap statusMap={statusMap} theme={theme} />
+        ) : (
+          <BangladeshMap
+            statusMap={statusMap}
+            theme={theme}
+            showLabels={settings?.showLabels ?? false}
+            labelLanguage={settings?.labelLanguage ?? 'en'}
+            ariaLabel={title}
+          />
+        )}
       </div>
 
       <div className="share-shared-layout">
         <div className="card card-pad cluster" style={{ gap: 24, justifyContent: 'center' }}>
-          <ProgressRing value={stats.travelPercent} size={140} sublabel={shortLocale === 'bn' ? 'বাংলাদেশের' : 'of Bangladesh'} />
+          <ProgressRing value={completed} size={140} sublabel={shortLocale === 'bn' ? (scope === 'world' ? 'বিশ্বের' : 'বাংলাদেশের') : scope === 'world' ? 'of the world' : 'of Bangladesh'} />
           <div className="stat-grid" style={{ flex: 1, minWidth: 240 }}>
             <div className="stat-tile">
-              <div className="stat-tile-value">{stats.visitedDistricts}/{stats.totalDistricts}</div>
-              <div className="stat-tile-label">{t('passport.districtsVisited')}</div>
+              <div className="stat-tile-value">{visited}/{total}</div>
+              <div className="stat-tile-label">{scope === 'world' ? t('world.title') : t('passport.districtsVisited')}</div>
             </div>
-            <div className="stat-tile">
-              <div className="stat-tile-value">{stats.divisionsComplete}/8</div>
-              <div className="stat-tile-label">{t('passport.divisionsComplete')}</div>
-            </div>
+            {scope === 'bd' ? (
+              <div className="stat-tile">
+                <div className="stat-tile-value">{divisions}/8</div>
+                <div className="stat-tile-label">{t('passport.divisionsComplete')}</div>
+              </div>
+            ) : null}
           </div>
         </div>
 
@@ -89,35 +98,16 @@ export default function SharedMapPage() {
           <span className="eyebrow">{t('share.shareTo')}</span>
           <div className="social-grid">
             {sharePlatforms.map((platform) => (
-              <button
-                key={platform}
-                type="button"
-                className="social-btn"
-                onClick={() => openShareWindow(platform, shareUrl, caption)}
-              >
+              <button key={platform} type="button" className="social-btn" onClick={() => openShareWindow(platform, shareUrl, caption)}>
                 {platform === 'x' ? 'X' : platform.charAt(0).toUpperCase() + platform.slice(1)}
               </button>
             ))}
           </div>
           <div className="share-links">
-            <button
-              type="button"
-              className="btn btn-secondary btn-sm"
-              onClick={() => {
-                void navigator.clipboard.writeText(shareUrl);
-                toast(t('share.linkCopied'), 'success');
-              }}
-            >
+            <button type="button" className="btn btn-secondary btn-sm" onClick={() => { void navigator.clipboard.writeText(shareUrl); toast(t('share.linkCopied'), 'success'); }}>
               <Link2 size={15} aria-hidden /> {t('share.shareLink')}
             </button>
-            <button
-              type="button"
-              className="btn btn-secondary btn-sm"
-              onClick={() => {
-                void navigator.clipboard.writeText(caption);
-                toast(t('share.captionCopied'), 'success');
-              }}
-            >
+            <button type="button" className="btn btn-secondary btn-sm" onClick={() => { void navigator.clipboard.writeText(caption); toast(t('share.captionCopied'), 'success'); }}>
               <Copy size={15} aria-hidden /> {t('share.copyCaption')}
             </button>
           </div>
@@ -137,7 +127,7 @@ export default function SharedMapPage() {
 
       <div className="pill-row" style={{ marginTop: 16 }}>
         {(['visited', 'want_to_go', 'favorite', 'lived_here'] as TravelStatus[]).map((status) => {
-          const count = Object.values(payload.statusMap).filter((s) => s === status).length;
+          const count = Object.values(statusMap).filter((s) => s === status).length;
           if (!count) return null;
           return (
             <span key={status} className="badge">

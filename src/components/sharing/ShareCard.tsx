@@ -1,6 +1,7 @@
+import { brand } from '@/config/brand';
 import type { TravelStatus } from '@/types';
 import type { MapTheme } from '@/lib/map/themes';
-import { statusList } from '@/components/ui/StatusPill';
+import type { ShareScope } from '@/lib/share/shareCode';
 import { ExportMap } from './ExportMap';
 
 export type ShareFormat = 'social' | 'square' | 'story';
@@ -11,127 +12,93 @@ export const shareFormatSize: Record<ShareFormat, { width: number; height: numbe
   story: { width: 1080, height: 1920 },
 };
 
-export interface ShareStat {
-  label: string;
-  value: string;
-}
-
-export interface ShareCardModel {
-  title: string;
-  subtitle?: string;
-  stats: ShareStat[];
-  displayName?: string;
-  dateLabel?: string;
-}
-
 interface ShareCardProps {
   format: ShareFormat;
-  model: ShareCardModel;
-  theme: MapTheme;
+  kind: ShareScope;
   statusMap: Record<string, TravelStatus>;
-  legendLabels: Record<TravelStatus, string>;
-  showLegend?: boolean;
-  showDate?: boolean;
+  theme: MapTheme;
+  locale: 'bn' | 'en';
+  progressText: string;
+  displayName?: string;
+  showLabels?: boolean;
   texture?: boolean;
 }
 
+const sizeConfig: Record<ShareFormat, { app: number; name: number; count: number; pad: number }> = {
+  social: { app: 36, name: 26, count: 42, pad: 40 },
+  square: { app: 48, name: 36, count: 56, pad: 56 },
+  story: { app: 56, name: 44, count: 68, pad: 72 },
+};
+
 export function ShareCard({
   format,
-  model,
-  theme,
+  kind,
   statusMap,
-  legendLabels,
-  showLegend = true,
-  showDate = true,
+  theme,
+  locale,
+  progressText,
+  displayName,
+  showLabels = true,
   texture,
 }: ShareCardProps) {
   const { width, height } = shareFormatSize[format];
-  const isStory = format === 'story';
-  const mapSize = isStory
-    ? { width: Math.round(width * 0.82), height: Math.round(height * 0.42) }
-    : format === 'square'
-      ? { width: Math.round(width * 0.62), height: Math.round(height * 0.44) }
-      : { width: Math.round(width * 0.4), height: Math.round(height * 0.74) };
+  const s = sizeConfig[format];
 
   return (
     <div
       style={{
         width,
         height,
+        position: 'relative',
+        overflow: 'hidden',
         background: theme.background,
-        color: theme.titleColor,
-        display: 'flex',
-        flexDirection: isStory ? 'column' : 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: isStory ? '90px 72px' : '56px 64px',
-        gap: 40,
         fontFamily: 'Inter, "Noto Sans Bengali", system-ui, sans-serif',
-        boxSizing: 'border-box',
       }}
     >
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: isStory ? 40 : 24, minWidth: 0 }}>
-        <div>
-          <div style={{ fontSize: 26, letterSpacing: 1.5, textTransform: 'uppercase', color: theme.accent, fontWeight: 700 }}>
-            {model.subtitle ?? 'ExploreBD'}
-          </div>
-          <h1 style={{ fontSize: isStory ? 84 : format === 'square' ? 62 : 58, lineHeight: 1.05, margin: '14px 0 0', color: theme.titleColor }}>
-            {model.title}
-          </h1>
-          {model.displayName ? (
-            <div style={{ fontSize: 34, marginTop: 18, color: theme.subtitleColor, fontWeight: 600 }}>{model.displayName}</div>
-          ) : null}
-        </div>
-
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 28 }}>
-          {model.stats.map((stat) => (
-            <div key={stat.label}>
-              <div style={{ fontSize: isStory ? 64 : 52, fontWeight: 800, color: theme.titleColor, lineHeight: 1 }}>
-                {stat.value}
-              </div>
-              <div style={{ fontSize: 24, color: theme.subtitleColor, marginTop: 6 }}>{stat.label}</div>
-            </div>
-          ))}
-        </div>
-
-        {showLegend ? (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20, marginTop: 8 }}>
-            {statusList.map((status) => (
-              <div key={status} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 22, color: theme.subtitleColor }}>
-                <span
-                  style={{
-                    width: 18,
-                    height: 18,
-                    borderRadius: 5,
-                    background: theme.status[status],
-                    display: 'inline-block',
-                    border: `1px solid ${theme.districtStroke}`,
-                  }}
-                />
-                {legendLabels[status]}
-              </div>
-            ))}
-          </div>
-        ) : null}
-
-        <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: theme.attributionColor, fontSize: 20 }}>
-          <span>ExploreBD · এক্সপ্লোর বিডি</span>
-          {showDate && model.dateLabel ? <span>{model.dateLabel}</span> : null}
-        </div>
-      </div>
+      <ExportMap
+        kind={kind}
+        statusMap={statusMap}
+        theme={theme}
+        width={width}
+        height={height}
+        texture={texture}
+        showLabels={showLabels}
+        locale={locale}
+      />
 
       <div
         style={{
-          width: mapSize.width,
-          height: mapSize.height,
-          borderRadius: 24,
-          overflow: 'hidden',
-          border: `1px solid ${theme.districtStroke}`,
-          flexShrink: 0,
-          background: theme.panel,
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          padding: `${s.pad * 1.2}px ${s.pad}px ${s.pad}px`,
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'space-between',
+          gap: 16,
+          background: `linear-gradient(to top, ${theme.background}f2 30%, ${theme.background}b3 65%, ${theme.background}00 100%)`,
         }}
       >
-        <ExportMap statusMap={statusMap} theme={theme} width={mapSize.width} height={mapSize.height} texture={texture} />
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontWeight: 800, fontSize: s.app, lineHeight: 1, color: theme.titleColor }}>{brand.name}</div>
+          <div style={{ fontSize: s.name, fontWeight: 600, color: theme.subtitleColor, marginTop: s.app * 0.12 }}>{brand.nameBn}</div>
+          {displayName ? (
+            <div style={{ fontWeight: 700, fontSize: s.name, color: theme.titleColor, marginTop: s.name * 0.5 }}>{displayName}</div>
+          ) : null}
+        </div>
+        <div
+          style={{
+            fontWeight: 800,
+            fontSize: s.count,
+            lineHeight: 1,
+            color: theme.titleColor,
+            textAlign: 'right',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {progressText}
+        </div>
       </div>
     </div>
   );

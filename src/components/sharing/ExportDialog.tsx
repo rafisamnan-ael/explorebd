@@ -7,25 +7,25 @@ import type { TravelStatus } from '@/types';
 interface ExportDialogProps {
   open: boolean;
   onClose: () => void;
-  statusMap: Record<string, TravelStatus>;
+  bdStatusMap: Record<string, TravelStatus>;
+  worldStatusMap: Record<string, TravelStatus>;
+  bdStats: SharePanelStats;
+  worldStats: SharePanelStats;
   theme: MapTheme;
-  legendLabels: Record<TravelStatus, string>;
-  stats: SharePanelStats;
   displayName?: string;
-  subtitle: string;
 }
 
-export function ExportDialog({ open, onClose, statusMap, theme, legendLabels, stats, displayName, subtitle }: ExportDialogProps) {
+export function ExportDialog({ open, onClose, bdStatusMap, worldStatusMap, bdStats, worldStats, theme, displayName }: ExportDialogProps) {
   const { t } = useI18n();
   return (
     <Modal open={open} onClose={onClose} title={t('share.title')}>
       <SharePanel
-        statusMap={statusMap}
+        bdStatusMap={bdStatusMap}
+        worldStatusMap={worldStatusMap}
+        bdStats={bdStats}
+        worldStats={worldStats}
         theme={theme}
-        legendLabels={legendLabels}
-        stats={stats}
         initialName={displayName}
-        subtitle={subtitle}
       />
     </Modal>
   );

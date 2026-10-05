@@ -1,8 +1,11 @@
 import { districts } from '@/data/districts';
+import { countries } from '@/data/countries';
 import type { TravelStatus } from '@/types';
 
-/** Stable district order so a code always maps back to the same districts. */
-const ORDER = districts.map((d) => d.id);
+export type ShareScope = 'bd' | 'world';
+
+const DISTRICT_ORDER = districts.map((d) => d.id);
+const COUNTRY_ORDER = countries.map((c) => c.id);
 
 const CODE: Record<TravelStatus, string> = {
   unvisited: '0',
@@ -23,8 +26,13 @@ const DECODE: Record<string, TravelStatus> = {
 export type StatusMap = Record<string, TravelStatus>;
 
 export interface SharePayload {
+  scope: ShareScope;
   name?: string;
   statusMap: StatusMap;
+}
+
+function orderFor(scope: ShareScope): string[] {
+  return scope === 'world' ? COUNTRY_ORDER : DISTRICT_ORDER;
 }
 
 function toBase64Url(text: string): string {
@@ -41,26 +49,25 @@ function fromBase64Url(code: string): string {
   return new TextDecoder().decode(bytes);
 }
 
-/**
- * Encodes a travel map into a short URL-safe string. Only non-unvisited
- * statuses are meaningful; the fixed 64-character digit string keeps decoding
- * simple and order-independent of future content edits.
- */
-export function encodeShareMap(statusMap: StatusMap, name = ''): string {
-  const digits = ORDER.map((id) => CODE[statusMap[id] ?? 'unvisited']).join('');
-  return toBase64Url(JSON.stringify({ v: 1, n: name.slice(0, 40), d: digits }));
+/** Encodes a travel map (districts or countries) into a short URL-safe string. */
+export function encodeShareMap(statusMap: StatusMap, name = '', scope: ShareScope = 'bd'): string {
+  const digits = orderFor(scope)
+    .map((id) => CODE[statusMap[id] ?? 'unvisited'])
+    .join('');
+  return toBase64Url(JSON.stringify({ v: 2, s: scope, n: name.slice(0, 40), d: digits }));
 }
 
 export function decodeShareMap(code: string): SharePayload | null {
   try {
-    const parsed = JSON.parse(fromBase64Url(code)) as { v?: number; n?: string; d?: string };
+    const parsed = JSON.parse(fromBase64Url(code)) as { v?: number; s?: string; n?: string; d?: string };
     if (!parsed || typeof parsed.d !== 'string') return null;
+    const scope: ShareScope = parsed.s === 'world' ? 'world' : 'bd';
     const statusMap: StatusMap = {};
-    ORDER.forEach((id, index) => {
+    orderFor(scope).forEach((id, index) => {
       const char = parsed.d![index];
       if (char && char !== '0') statusMap[id] = DECODE[char] ?? 'unvisited';
     });
-    return { name: parsed.n || undefined, statusMap };
+    return { scope, name: parsed.n || undefined, statusMap };
   } catch {
     return null;
   }
@@ -78,17 +85,23 @@ export interface CaptionStats {
   percent: number;
 }
 
-export function buildShareCaption(locale: 'bn' | 'en', stats: CaptionStats): string {
+export function buildShareCaption(locale: 'bn' | 'en', stats: CaptionStats, scope: ShareScope = 'bd'): string {
+  const unitEn = scope === 'world' ? 'countries' : 'districts of Bangladesh';
+  const regionEn = scope === 'world' ? 'the world' : 'Bangladesh';
+  const tag = scope === 'world' ? '#ExploreBD #World #Travel' : '#ExploreBD #Bangladesh #TravelBangladesh';
+
   if (locale === 'bn') {
+    const unitBn = scope === 'world' ? 'দেশের মধ্যে' : 'জেলার মধ্যে';
+    const regionBn = scope === 'world' ? 'বিশ্বের' : 'বাংলাদেশের';
     return [
-      `আমি বাংলাদেশের ${stats.total}টি জেলার মধ্যে ${stats.visited}টি ঘুরেছি (${stats.percent}%) — ${stats.divisions}টি বিভাগ সম্পূর্ণ! 🇧🇩`,
-      'আপনার বাংলাদেশ ভ্রমণ ম্যাপ বানান ও শেয়ার করুন 👇',
-      '#এক্সপ্লোরবিডি #বাংলাদেশ #ভ্রমণ',
+      `আমি ${regionBn} ${stats.total}টির ${unitBn} ${stats.visited}টি ঘুরেছি (${stats.percent}%)! 🌍`,
+      'আপনার ভ্রমণ ম্যাপ বানান ও শেয়ার করুন 👇',
+      scope === 'world' ? '#এক্সপ্লোরবিডি #বিশ্ব #ভ্রমণ' : '#এক্সপ্লোরবিডি #বাংলাদেশ #ভ্রমণ',
     ].join('\n');
   }
   return [
-    `I've explored ${stats.visited} of ${stats.total} districts of Bangladesh (${stats.percent}%) — ${stats.divisions} divisions complete! 🇧🇩`,
-    'Build and share your own Bangladesh travel map 👇',
-    '#ExploreBD #Bangladesh #TravelBangladesh',
+    `I've explored ${stats.visited} of ${stats.total} ${unitEn} (${stats.percent}%)! 🌍`,
+    `Build and share your own ${regionEn} travel map 👇`,
+    tag,
   ].join('\n');
 }

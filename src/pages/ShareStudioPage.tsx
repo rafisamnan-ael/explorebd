@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ImagePlus } from 'lucide-react';
 import { useI18n } from '@/i18n';
@@ -6,6 +7,7 @@ import { usePassportStore } from '@/store/passportStore';
 import { useSettingsStore } from '@/store/settingsStore';
 import { computeStats } from '@/lib/passport/stats';
 import { getMapTheme } from '@/lib/map/themes';
+import { countries } from '@/data/countries';
 import { SharePanel } from '@/components/sharing/SharePanel';
 import { PageHero } from '@/components/common/Chrome';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -13,25 +15,40 @@ import type { TravelStatus } from '@/types';
 
 export default function ShareStudioPage() {
   const { t } = useI18n();
-  const statusMap = useStatusMap();
+  const bdStatusMap = useStatusMap();
   const entries = usePassportStore((s) => s.entries);
+  const countryEntries = usePassportStore((s) => s.countryEntries);
   const settings = useSettingsStore((s) => s.settings);
-  const stats = computeStats(statusMap, entries);
   const theme = getMapTheme(settings?.mapThemeId ?? 'forest');
 
-  const legendLabels = {
-    unvisited: t('status.unvisited'),
-    want_to_go: t('status.want_to_go'),
-    visited: t('status.visited'),
-    favorite: t('status.favorite'),
-    lived_here: t('status.lived_here'),
-  } as Record<TravelStatus, string>;
+  const bdStats = useMemo(() => {
+    const s = computeStats(bdStatusMap, entries);
+    return {
+      visited: s.visitedDistricts,
+      total: s.totalDistricts,
+      divisions: s.divisionsComplete,
+      percent: Math.round(s.travelPercent * 100),
+    };
+  }, [bdStatusMap, entries]);
+
+  const worldStatusMap = useMemo(() => {
+    const map: Record<string, TravelStatus> = {};
+    for (const e of countryEntries) map[e.entityId] = e.status;
+    return map;
+  }, [countryEntries]);
+
+  const worldStats = useMemo(() => {
+    const visited = Object.values(worldStatusMap).filter((s) => s === 'visited' || s === 'favorite' || s === 'lived_here').length;
+    return { visited, total: countries.length, divisions: 0, percent: Math.round((visited / countries.length) * 100) };
+  }, [worldStatusMap]);
+
+  const hasAny = bdStats.visited > 0 || entries.length > 0 || countryEntries.length > 0;
 
   return (
     <div className="container page">
       <PageHero eyebrow={t('nav.passport')} title={t('share.studio')} body={t('share.subtitle')} />
 
-      {stats.visitedDistricts === 0 && entries.length === 0 ? (
+      {!hasAny ? (
         <EmptyState
           icon={<ImagePlus size={22} aria-hidden />}
           title={t('passport.markFirst')}
@@ -40,17 +57,12 @@ export default function ShareStudioPage() {
         />
       ) : (
         <SharePanel
-          statusMap={statusMap}
+          bdStatusMap={bdStatusMap}
+          worldStatusMap={worldStatusMap}
+          bdStats={bdStats}
+          worldStats={worldStats}
           theme={theme}
-          legendLabels={legendLabels}
           initialName={settings?.displayName}
-          subtitle={t('home.title')}
-          stats={{
-            visited: stats.visitedDistricts,
-            total: stats.totalDistricts,
-            divisions: stats.divisionsComplete,
-            percent: Math.round(stats.travelPercent * 100),
-          }}
         />
       )}
     </div>

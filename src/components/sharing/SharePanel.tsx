@@ -17,11 +17,11 @@ import {
 import { useI18n } from '@/i18n';
 import { useUiStore } from '@/store/uiStore';
 import { Segmented } from '@/components/ui/Segmented';
-import { ShareCard, shareFormatSize, type ShareCardModel, type ShareFormat } from './ShareCard';
+import { ShareCard, shareFormatSize, type ShareFormat } from './ShareCard';
 import type { MapTheme } from '@/lib/map/themes';
 import type { TravelStatus } from '@/types';
 import { downloadDataUrl, downloadPdf, nodeToJpeg, nodeToPng, printNode } from '@/lib/export/exportImage';
-import { buildShareCaption, encodeShareMap, shareMapUrl } from '@/lib/share/shareCode';
+import { buildShareCaption, encodeShareMap, shareMapUrl, type ShareScope } from '@/lib/share/shareCode';
 import { dataUrlToFile, nativeShare, openShareWindow, platformShareUrl, sharePlatforms, type SharePlatform } from '@/lib/share/social';
 
 const platformIcons: Record<SharePlatform, typeof Facebook> = {
@@ -41,46 +41,65 @@ export interface SharePanelStats {
 }
 
 interface SharePanelProps {
-  statusMap: Record<string, TravelStatus>;
+  bdStatusMap: Record<string, TravelStatus>;
+  worldStatusMap: Record<string, TravelStatus>;
+  bdStats: SharePanelStats;
+  worldStats: SharePanelStats;
   theme: MapTheme;
-  legendLabels: Record<TravelStatus, string>;
-  stats: SharePanelStats;
   initialName?: string;
-  subtitle: string;
-  initialFormat?: ShareFormat;
+  defaultScope?: ShareScope;
 }
 
-export function SharePanel({ statusMap, theme, legendLabels, stats, initialName, subtitle, initialFormat = 'social' }: SharePanelProps) {
-  const { t, shortLocale, formatDate } = useI18n();
+const platformName = (p: SharePlatform) => (p === 'x' ? 'X' : p.charAt(0).toUpperCase() + p.slice(1));
+
+export function SharePanel({ bdStatusMap, worldStatusMap, bdStats, worldStats, theme, initialName, defaultScope = 'bd' }: SharePanelProps) {
+  const { t, shortLocale } = useI18n();
   const toast = useUiStore((s) => s.toast);
-  const [format, setFormat] = useState<ShareFormat>(initialFormat);
-  const [showLegend, setShowLegend] = useState(true);
-  const [showDate, setShowDate] = useState(true);
+  const [scope, setScope] = useState<ShareScope>(defaultScope);
+  const [format, setFormat] = useState<ShareFormat>('square');
+  const [showLabels, setShowLabels] = useState(true);
   const [name, setName] = useState(initialName ?? '');
   const [caption, setCaption] = useState('');
   const [busy, setBusy] = useState<string | null>(null);
   const captureRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    setCaption(buildShareCaption(shortLocale, stats));
-  }, [shortLocale, stats]);
+  const statusMap = scope === 'bd' ? bdStatusMap : worldStatusMap;
+  const stats = scope === 'bd' ? bdStats : worldStats;
 
-  const shareCode = useMemo(() => encodeShareMap(statusMap, name), [statusMap, name]);
+  useEffect(() => {
+    setCaption(buildShareCaption(shortLocale, stats, scope));
+  }, [shortLocale, stats, scope]);
+
+  const progressText = useMemo(() => {
+    const unit =
+      scope === 'bd'
+        ? shortLocale === 'bn'
+          ? 'জেলা'
+          : 'districts'
+        : shortLocale === 'bn'
+          ? 'দেশ'
+          : 'countries';
+    return `${stats.visited} / ${stats.total} ${unit}`;
+  }, [scope, shortLocale, stats]);
+
+  const shareCode = useMemo(() => encodeShareMap(statusMap, name, scope), [statusMap, name, scope]);
   const shareUrl = useMemo(() => shareMapUrl(shareCode), [shareCode]);
   const size = shareFormatSize[format];
   const previewScale = Math.min(1, 520 / size.width);
 
-  const model: ShareCardModel = {
-    title: t('map.progress', { visited: stats.visited, total: stats.total }),
-    subtitle,
-    displayName: name || undefined,
-    dateLabel: formatDate(new Date()),
-    stats: [
-      { label: t('passport.districtsVisited'), value: String(stats.visited) },
-      { label: t('passport.divisionsComplete'), value: `${stats.divisions}/8` },
-      { label: t('passport.travelPercent'), value: `${stats.percent}%` },
-    ],
-  };
+  const card = (
+    <ShareCard
+      format={format}
+      kind={scope}
+      statusMap={statusMap}
+      theme={theme}
+      locale={shortLocale}
+      progressText={progressText}
+      displayName={name || undefined}
+      showLabels={showLabels}
+      texture
+    />
+  );
 
   const withCapture = async (key: string, task: () => Promise<void>) => {
     if (!captureRef.current) return;
@@ -107,12 +126,7 @@ export function SharePanel({ statusMap, theme, legendLabels, stats, initialName,
     withCapture('native', async () => {
       const dataUrl = await nodeToPng(captureRef.current!, 2);
       const file = dataUrlToFile(dataUrl, `explorebd-map-${Date.now()}.png`);
-      const ok = await nativeShare({
-        title: t('share.title'),
-        text: `${caption}\n${shareUrl}`,
-        url: shareUrl,
-        file,
-      });
+      const ok = await nativeShare({ title: t('share.title'), text: `${caption}\n${shareUrl}`, url: shareUrl, file });
       if (!ok) toast(t('share.nativeUnsupported'));
     });
 
@@ -128,29 +142,31 @@ export function SharePanel({ statusMap, theme, legendLabels, stats, initialName,
             border: '1px solid var(--border)',
           }}
         >
-          <div style={{ transform: `scale(${previewScale})`, transformOrigin: 'top left' }}>
-            <ShareCard
-              format={format}
-              model={model}
-              theme={theme}
-              statusMap={statusMap}
-              legendLabels={legendLabels}
-              showLegend={showLegend}
-              showDate={showDate}
-              texture
-            />
-          </div>
+          <div style={{ transform: `scale(${previewScale})`, transformOrigin: 'top left' }}>{card}</div>
         </div>
       </div>
 
       <div className="share-controls stack" style={{ gap: 18 }}>
+        <div className="field">
+          <span className="field-label">{t('map.modeAria')}</span>
+          <Segmented
+            ariaLabel={t('map.modeAria')}
+            value={scope}
+            onChange={setScope}
+            options={[
+              { value: 'bd', label: t('map.modeBangladesh') },
+              { value: 'world', label: t('map.modeWorld') },
+            ]}
+          />
+        </div>
+
         <Segmented
           ariaLabel={t('share.preview')}
           value={format}
           onChange={setFormat}
           options={[
-            { value: 'social', label: t('export.png') },
             { value: 'square', label: t('export.square') },
+            { value: 'social', label: 'Facebook' },
             { value: 'story', label: t('export.story') },
           ]}
         />
@@ -160,16 +176,10 @@ export function SharePanel({ statusMap, theme, legendLabels, stats, initialName,
           <input id="share-name" className="input" value={name} maxLength={40} placeholder={t('map.displayNamePlaceholder')} onChange={(e) => setName(e.target.value)} />
         </div>
 
-        <div className="pill-row">
-          <label className="cluster" style={{ gap: 8, fontWeight: 600, fontSize: '0.85rem' }}>
-            <input type="checkbox" checked={showLegend} onChange={(e) => setShowLegend(e.target.checked)} />
-            {t('export.includeLegend')}
-          </label>
-          <label className="cluster" style={{ gap: 8, fontWeight: 600, fontSize: '0.85rem' }}>
-            <input type="checkbox" checked={showDate} onChange={(e) => setShowDate(e.target.checked)} />
-            {t('export.includeDate')}
-          </label>
-        </div>
+        <label className="cluster" style={{ gap: 8, fontWeight: 600, fontSize: '0.85rem' }}>
+          <input type="checkbox" checked={showLabels} onChange={(e) => setShowLabels(e.target.checked)} />
+          {t('map.labels')}
+        </label>
 
         <div className="field">
           <label className="field-label" htmlFor="share-caption">{t('share.caption')}</label>
@@ -199,7 +209,7 @@ export function SharePanel({ statusMap, theme, legendLabels, stats, initialName,
                   }}
                 >
                   <Icon size={16} aria-hidden />
-                  {platform === 'x' ? 'X' : platform.charAt(0).toUpperCase() + platform.slice(1)}
+                  {platformName(platform)}
                 </a>
               );
             })}
@@ -218,13 +228,13 @@ export function SharePanel({ statusMap, theme, legendLabels, stats, initialName,
         <div className="stack" style={{ gap: 8 }}>
           <span className="eyebrow">{t('share.download')}</span>
           <div className="cluster" style={{ gap: 10, flexWrap: 'wrap' }}>
-            <button type="button" className="btn btn-primary btn-sm" disabled={busy === 'png'} onClick={() => void withCapture('png', async () => { const d = await nodeToPng(captureRef.current!, 2); downloadDataUrl(d, `explorebd-${format}.png`); toast(t('export.ready'), 'success'); })}>
+            <button type="button" className="btn btn-primary btn-sm" disabled={busy === 'png'} onClick={() => void withCapture('png', async () => { const d = await nodeToPng(captureRef.current!, 2); downloadDataUrl(d, `explorebd-${scope}-${format}.png`); toast(t('export.ready'), 'success'); })}>
               {busy === 'png' ? <Loader2 size={15} className="spin" aria-hidden /> : <FileImage size={15} aria-hidden />} PNG
             </button>
-            <button type="button" className="btn btn-secondary btn-sm" disabled={busy === 'jpg'} onClick={() => void withCapture('jpg', async () => { const d = await nodeToJpeg(captureRef.current!, 2); downloadDataUrl(d, `explorebd-${format}.jpg`); toast(t('export.ready'), 'success'); })}>
+            <button type="button" className="btn btn-secondary btn-sm" disabled={busy === 'jpg'} onClick={() => void withCapture('jpg', async () => { const d = await nodeToJpeg(captureRef.current!, 2); downloadDataUrl(d, `explorebd-${scope}-${format}.jpg`); toast(t('export.ready'), 'success'); })}>
               <Download size={15} aria-hidden /> JPG
             </button>
-            <button type="button" className="btn btn-secondary btn-sm" disabled={busy === 'pdf'} onClick={() => void withCapture('pdf', async () => { await downloadPdf(captureRef.current!, `explorebd-${format}.pdf`); toast(t('export.ready'), 'success'); })}>
+            <button type="button" className="btn btn-secondary btn-sm" disabled={busy === 'pdf'} onClick={() => void withCapture('pdf', async () => { await downloadPdf(captureRef.current!, `explorebd-${scope}-${format}.pdf`); toast(t('export.ready'), 'success'); })}>
               <FileText size={15} aria-hidden /> PDF
             </button>
             <button type="button" className="btn btn-ghost btn-sm" onClick={() => void withCapture('print', async () => { await printNode(captureRef.current!); })}>
@@ -237,18 +247,7 @@ export function SharePanel({ statusMap, theme, legendLabels, stats, initialName,
       </div>
 
       <div aria-hidden style={{ position: 'fixed', left: -100000, top: 0, pointerEvents: 'none', opacity: 0 }}>
-        <div ref={captureRef}>
-          <ShareCard
-            format={format}
-            model={model}
-            theme={theme}
-            statusMap={statusMap}
-            legendLabels={legendLabels}
-            showLegend={showLegend}
-            showDate={showDate}
-            texture
-          />
-        </div>
+        <div ref={captureRef}>{card}</div>
       </div>
     </div>
   );

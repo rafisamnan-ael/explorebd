@@ -9,6 +9,7 @@ import { useStatusMap } from '@/hooks/useStatusMap';
 import { computeStats } from '@/lib/passport/stats';
 import { getMapTheme } from '@/lib/map/themes';
 import { districts } from '@/data/districts';
+import { countries } from '@/data/countries';
 import { statusMeta } from '@/components/ui/StatusPill';
 import { Sheet } from '@/components/ui/Sheet';
 import { Modal } from '@/components/ui/Modal';
@@ -75,17 +76,16 @@ export default function MapPage() {
     });
   }, [divisionFilter, statusFilter, query, statusMap]);
 
-  const legendLabels = useMemo(
-    () =>
-      ({
-        unvisited: t('status.unvisited'),
-        want_to_go: t('status.want_to_go'),
-        visited: t('status.visited'),
-        favorite: t('status.favorite'),
-        lived_here: t('status.lived_here'),
-      }) satisfies Record<TravelStatus, string>,
-    [t],
-  );
+  const countryEntries = usePassportStore((s) => s.countryEntries);
+  const worldStatusMap = useMemo(() => {
+    const map: Record<string, TravelStatus> = {};
+    for (const e of countryEntries) map[e.entityId] = e.status;
+    return map;
+  }, [countryEntries]);
+  const worldStats = useMemo(() => {
+    const visited = Object.values(worldStatusMap).filter((s) => s === 'visited' || s === 'favorite' || s === 'lived_here').length;
+    return { visited, total: countries.length, divisions: 0, percent: Math.round((visited / countries.length) * 100) };
+  }, [worldStatusMap]);
 
   const handleMapClick = (districtId: string) => {
     const current = statusMap[districtId] ?? 'unvisited';
@@ -287,17 +287,17 @@ export default function MapPage() {
       <ExportDialog
         open={exportOpen}
         onClose={() => setExportOpen(false)}
-        statusMap={statusMap}
+        bdStatusMap={statusMap}
+        worldStatusMap={worldStatusMap}
         theme={theme}
-        legendLabels={legendLabels}
         displayName={settings?.displayName || undefined}
-        subtitle={t('home.title')}
-        stats={{
+        bdStats={{
           visited: stats.visitedDistricts,
           total: stats.totalDistricts,
           divisions: stats.divisionsComplete,
           percent: Math.round(stats.travelPercent * 100),
         }}
+        worldStats={worldStats}
       />
     </div>
   );
