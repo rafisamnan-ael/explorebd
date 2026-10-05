@@ -15,6 +15,8 @@ guide, planner, games and PWA are functional end to end. Details below.
 | `npm run build` | ✅ production build passing |
 | `npm run scripts:validate` | ✅ GeoJSON + content valid |
 | Browser smoke test (home, map) | ✅ no console errors; 64 labels, 64 list rows |
+| Live deployment (Vercel) | ✅ https://explorebd-three.vercel.app |
+| Share Studio + `/m/:code` link | ✅ verified live (encodes/decodes status map, 0 console errors) |
 | Playwright e2e | ⚠️ provided; requires `npx playwright install` |
 
 ## Completed
@@ -64,6 +66,10 @@ guide, planner, games and PWA are functional end to end. Details below.
 
 ### Additional
 - World map (~195 countries) with statuses, lazy-loaded geometry, continent filters.
+- **Share Studio** (`/share`): data-driven social card (social/square/story), editable bilingual
+  caption with hashtags, Web Share API on mobile, one-tap share to Facebook/X/WhatsApp/Telegram/
+  LinkedIn/Reddit, PNG/JPG/PDF/print, and a **shareable read-only map link** (`/m/:code`) that
+  decodes a compact status map with a "build your own" CTA — the primary marketing/viral loop.
 - Travel journal with client-side image compression and IndexedDB photo blobs.
 - Passport dashboard: stats, division progress, achievements/badges, next milestone.
 - PWA manifest, service worker (app shell + GeoJSON stale-while-revalidate, no bulk tiles),
