@@ -41,7 +41,6 @@ export default function MapPage() {
   const toast = useUiStore((s) => s.toast);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [popover, setPopover] = useState<{ id: string; x: number; y: number } | null>(null);
   const [query, setQuery] = useState('');
   const [divisionFilter, setDivisionFilter] = useState<string | 'all'>('all');
   const [statusFilter, setStatusFilter] = useState<TravelStatus | 'all'>('all');
@@ -88,17 +87,13 @@ export default function MapPage() {
     [t],
   );
 
-  const handleMapClick = (districtId: string, point: { x: number; y: number }) => {
+  const handleMapClick = (districtId: string) => {
     const current = statusMap[districtId] ?? 'unvisited';
     if (current === 'unvisited') {
       void setStatus(districtId, 'visited');
     }
     setSelectedId(districtId);
-    if (isMobile) {
-      setPanel('list');
-    } else {
-      setPopover({ id: districtId, x: point.x, y: point.y });
-    }
+    if (isMobile) setPanel('list');
   };
 
   const pickStatus = (districtId: string, status: TravelStatus) => {
@@ -205,7 +200,6 @@ export default function MapPage() {
               </button>
             </div>
           </div>
-          <div className="map-panel-section">{listSection}</div>
           {!isMobile && selectedId ? (
             <div className="map-panel-section" aria-live="polite">
               <div className="cluster" style={{ justifyContent: 'space-between' }}>
@@ -222,6 +216,7 @@ export default function MapPage() {
               />
             </div>
           ) : null}
+          <div className="map-panel-section">{listSection}</div>
           <div className="map-panel-section">{filtersSection}</div>
           <div className="map-panel-section">{styleSection}</div>
           <div className="map-panel-section">
@@ -240,29 +235,8 @@ export default function MapPage() {
             labelLanguage={settings?.labelLanguage ?? 'en'}
             selectedDistrictId={selectedId}
             onDistrictClick={handleMapClick}
-            onBackgroundClick={() => {
-              setPopover(null);
-              setSelectedId(null);
-            }}
+            onBackgroundClick={() => setSelectedId(null)}
           />
-          {!isMobile && popover ? (
-            <div className="map-popover" style={{ left: popover.x, top: popover.y }} role="dialog" aria-label={t('status.setStatus')}>
-              <div className="map-popover-head">
-                <strong>{nameOf(popover.id)}</strong>
-                <button type="button" className="btn btn-sm btn-ghost" onClick={() => setPopover(null)}>
-                  {t('common.done')}
-                </button>
-              </div>
-              <StatusEditorOptions
-                current={statusMap[popover.id] ?? 'unvisited'}
-                onPick={(status) => pickStatus(popover.id, status)}
-                onClear={() => {
-                  void clearStatus(popover.id);
-                  setPopover(null);
-                }}
-              />
-            </div>
-          ) : null}
         </div>
       </div>
 
