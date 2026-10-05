@@ -60,7 +60,7 @@ export default function SharedMapPage() {
     <div className="container page">
       <PageHero eyebrow={t('share.title')} title={title} body={t('share.sharedProgress', { visited: stats.visitedDistricts, total: stats.totalDistricts })} />
 
-      <div className="map-stage" style={{ height: '56vh', marginBottom: 20 }}>
+      <div className="map-stage" style={{ marginBottom: 20 }}>
         <BangladeshMap
           statusMap={payload.statusMap}
           theme={theme}

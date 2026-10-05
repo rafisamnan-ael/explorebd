@@ -592,20 +592,14 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-map);
   overflow: hidden;
-  height: 58vh;
-  min-height: 340px;
+  height: clamp(380px, 58vh, 560px);
+  min-height: 380px;
   background: var(--surface-2);
 }
 @media (min-width: 960px) {
   .map-workspace {
     grid-template-columns: 360px minmax(0, 1fr);
     align-items: start;
-  }
-  .map-stage {
-    position: sticky;
-    top: calc(var(--header-h) + 16px);
-    height: calc(100vh - var(--header-h) - 48px);
-    min-height: 520px;
   }
   .map-panel-section .panel-scroll {
     max-height: 34vh;
@@ -1231,8 +1225,8 @@ input[type='range'] {
 }
 .puzzle-map {
   position: relative;
-  height: 58vh;
-  min-height: 320px;
+  height: clamp(360px, 56vh, 540px);
+  min-height: 360px;
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
   overflow: hidden;

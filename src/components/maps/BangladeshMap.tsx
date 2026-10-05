@@ -107,6 +107,12 @@ export function BangladeshMap({
       attributionControl: false,
       dragRotate: false,
       pitchWithRotate: false,
+      scrollZoom: false,
+      boxZoom: false,
+      doubleClickZoom: false,
+      touchZoomRotate: false,
+      keyboard: false,
+      dragPan: false,
     });
     mapRef.current = map;
 
